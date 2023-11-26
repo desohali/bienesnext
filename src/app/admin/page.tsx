@@ -1,86 +1,45 @@
-"use client";
-
+"use client"
 import React from 'react';
-import { Button, Spin, Form, Input, Select, Typography } from 'antd';
+import { Form, Input, Button, Row, Col, Card, Tag, Typography } from 'antd';
+import { ArrowRightOutlined } from '@ant-design/icons';
 
-const { Option } = Select;
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const layout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 16 },
 };
 
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+const customizeRequiredMark = (label: React.ReactNode, { required }: { required: boolean }) => (
+  <>
+    {required ? <Tag color="error">Required</Tag> : <Tag color="warning">optional</Tag>}
+    {label}
+  </>
+);
 
-const App: React.FC = () => {
-  const [form] = Form.useForm();
-  const [loading, setloading] = React.useState(true);
-  React.useEffect(() => {
-    setloading(false);
-  }, [])
-
-  const onGenderChange = (value: string) => {
-    switch (value) {
-      case 'male':
-        form.setFieldsValue({ note: 'Hi, man!' });
-        break;
-      case 'female':
-        form.setFieldsValue({ note: 'Hi, lady!' });
-        break;
-      case 'other':
-        form.setFieldsValue({ note: 'Hi there!' });
-        break;
-      default:
-    }
-  };
-
+const Login = () => {
   const onFinish = (values: any) => {
-    console.log(values);
+    console.log('Received values:', values);
   };
-
-  const onReset = () => {
-    form.resetFields();
-  };
-
-  const onFill = () => {
-    form.setFieldsValue({ note: 'Hello world!', gender: 'male' });
-  };
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <Spin tip="CARGANDO..." size="large" />
-      </div>
-    )
-  }
 
   return (
-    <div>
-      <Title level={2}>Formulario con 11 Campos</Title>
-      <Form
-        form={form}
-        onFinish={onFinish}
-        initialValues={{
-          field1: '',
-          field2: '',
-          // ... inicializa los otros campos aquí
-          field11: '',
-        }}
-      >
-        <Form.Item name="field1" label="Note" rules={[{ required: true }]}>
-          <Input />
-        </Form.Item>
-        <Form.Item name="field2" label="Note" rules={[{ required: true }]}>
-          <Input />
-        </Form.Item>
-        <Form.Item name="field11" label="Note" rules={[{ required: true }]}>
-          <Input />
-        </Form.Item>
-      </Form>
-    </div>
+    <Row justify="center" align="middle" style={{ height: "100vh", width: "100vw" }}>
+      <Col xs={20} sm={18} md={14} lg={12}>
+        <Card hoverable style={{ width: "100%" }} title={<Text strong>Registro de bienes </Text>} >
+          <Form {...layout} name="login-form" initialValues={{ remember: true }} onFinish={onFinish} requiredMark={customizeRequiredMark}>
+            <Form.Item label={<Text>Ingrese dni</Text>} name="dni" rules={[{ required: true, message: 'Por favor ingrese dni!' }]}>
+              <Input />
+            </Form.Item>
+            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+              <Button icon={<ArrowRightOutlined />} type="primary" htmlType="submit">
+                Ingresar
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
+      </Col>
+    </Row>
   );
 };
 
-export default App;
+export default Login;
