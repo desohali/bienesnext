@@ -3,11 +3,12 @@ import React from 'react';
 import { Result, Spin } from 'antd';
 
 const App: React.FC = () => {
+
   const [loading, setloading] = React.useState<Boolean>(true);
   React.useEffect(() => {
     setloading(false);
   }, []);
-  
+
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
