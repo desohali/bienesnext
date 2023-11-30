@@ -19,7 +19,7 @@ const customizeRequiredMark = (label: React.ReactNode, { required }: { required:
   </>
 );
 
-const App = () => {
+const App: React.FC = () => {
 
   const router = useRouter();
   const usuario = useSelector((state: any) => state.user.user);

@@ -3,9 +3,8 @@ import Hola from '@/components/Hola'
 import React from 'react'
 import { useSelector } from 'react-redux';
 
-const page = () => {
+const App: React.FC = () => {
   const menuButtonKey = useSelector((state: any) => state.admin.menuButtonKey);
-  console.log('menuButtonKey', menuButtonKey)
   return (
     <React.Suspense>
       <Hola />
@@ -13,4 +12,4 @@ const page = () => {
   )
 }
 
-export default page
+export default App;

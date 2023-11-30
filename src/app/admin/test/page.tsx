@@ -1,10 +1,10 @@
-"use client"
-import React from 'react'
+"use client";
+import React from 'react';
 
-const page = () => {
+const App: React.FC = () => {
   return (
     <div>page2</div>
   )
 }
 
-export default page
+export default App;
