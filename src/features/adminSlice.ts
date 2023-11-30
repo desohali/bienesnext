@@ -1,7 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: any = {
-  menuButtonKey: "Inicio",
+  menuButtonKey: "Rifas",
+  openFormRifa: false
 };
 
 export const adminSlice = createSlice({
@@ -11,10 +12,13 @@ export const adminSlice = createSlice({
     setMenuButtonKey: (state, action) => {
       state.menuButtonKey = action.payload;
     },
+    setOpenFormRifa: (state, action) => {
+      state.openFormRifa = action.payload;
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { setMenuButtonKey } = adminSlice.actions;
+export const { setMenuButtonKey, setOpenFormRifa } = adminSlice.actions;
 
 export default adminSlice.reducer;

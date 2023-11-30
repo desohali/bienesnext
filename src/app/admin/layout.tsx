@@ -1,20 +1,24 @@
-"use client"
+"use client";
 import React from 'react';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   HomeFilled,
+  UserOutlined,
   SketchOutlined,
 } from '@ant-design/icons';
-import { Layout, Menu, Button, theme, Spin } from 'antd';
+import { Layout, Menu, theme, Spin, Breadcrumb, Drawer, Space, DrawerProps, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { setMenuButtonKey } from '@/features/adminSlice';
+import { Footer } from 'antd/es/layout/layout';
 
-const { Header, Sider, Content } = Layout;
+const { Title } = Typography;
+const { Header, Content } = Layout;
 
 const App: React.FC = ({ children }: any) => {
 
   const dispatch = useDispatch();
+  const menuButtonKey = useSelector((state: any) => state.admin.menuButtonKey);
 
   const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
@@ -23,45 +27,33 @@ const App: React.FC = ({ children }: any) => {
 
   const handleMenuClick = (e: any) => {
     dispatch(setMenuButtonKey(e.key));
+    setOpen(false);
   };
-
-  const menuButtonKey = useSelector((state: any) => state.admin.menuButtonKey);
-
-  const [collapsed, setCollapsed] = React.useState(false);
-  React.useEffect(() => {
-    const handleResize = () => {
-      if (window.matchMedia('(max-width: 600px)').matches) {
-        // Acciones cuando el ancho de la ventana sea menor o igual a 600px
-        setCollapsed(true);
-      } else {
-        // Acciones cuando el ancho de la ventana sea mayor a 600px
-        setCollapsed(false);
-      }
-    };
-
-    // Llamada inicial al cargar la página
-    handleResize();
-
-    // Agregar el listener para cambios de tamaño en la ventana
-    window.addEventListener('resize', handleResize);
-
-    // Remover el listener al desmontar el componente
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
 
 
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  const menu = [
-    {
+  // Drawer
+  const [open, setOpen] = React.useState(false);
+  const [size, setSize] = React.useState<DrawerProps['size']>();
+
+  const showDefaultDrawer = () => {
+    setSize('default');
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
+
+  const menu: any = [
+    /* {
       key: 'Inicio',
       icon: <HomeFilled />,
       label: 'Inicio',
-    },
+    }, */
     {
       key: 'Rifas',
       icon: <SketchOutlined />,
@@ -78,41 +70,51 @@ const App: React.FC = ({ children }: any) => {
   }
 
   return (
-    <Layout>
-      <Sider trigger={null} collapsible collapsed={collapsed}>
-        <div className="demo-logo-vertical" />
+    <Layout className="layout" style={{height:"100vh" }}>
+      <Header style={{ display: 'flex', alignItems: 'center' }}>
+        <div className="demo-logo" />
         <Menu
           theme="dark"
-          mode="inline"
+          mode="horizontal"
           defaultSelectedKeys={[menuButtonKey]}
-          onClick={handleMenuClick}
-          items={menu}
+          items={[{ key: "Rifas", icon: <MenuFoldOutlined style={{ fontSize: "18px", marginLeft: "12px" }} /> }]}
+          onClick={showDefaultDrawer}
         />
-      </Sider>
-      <Layout>
-        <Header style={{ padding: 0, background: colorBgContainer }}>
-          <Button
-            type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
-            style={{
-              display: (collapsed ? "none" : "unset"),
-              fontSize: '16px',
-              width: 64,
-              height: 64,
-            }}
+        <Space direction="vertical" style={{ margin: "auto" }}>
+          <Title style={{ color: "white" }} level={3}>Rifa el medallón</Title>
+        </Space>
+
+      </Header>
+      <Content style={{ padding: '0 24px' }}>
+        <Drawer
+          title={`${size} Drawer`}
+          placement="left"
+          size={size}
+          onClose={onClose}
+          open={open}>
+          <Menu
+            theme='light'
+            defaultSelectedKeys={[menuButtonKey]}
+            onClick={handleMenuClick}
+            mode="inline"
+            items={menu}
           />
-        </Header>
-        <Content
-          style={{
-            margin: '24px 16px',
-            padding: 24,
-            minHeight: 580,
-            background: colorBgContainer,
-          }}>
+        </Drawer>
+        <Breadcrumb
+          items={menu.filter((m: any) => m.key == menuButtonKey).map((m: any) => ({
+            title: (
+              <>
+                {m.icon}
+                <span>{m.label}</span>
+              </>
+            )
+          }))}
+          style={{ margin: '16px 0' }} />
+        <div className="site-layout-content" style={{ background: colorBgContainer, padding:"12px"}}>
           {children}
-        </Content>
-      </Layout>
+        </div>
+      </Content>
+      <Footer style={{ textAlign: 'center' }}>Ant Design ©2023 Created by Ant UED</Footer>
     </Layout>
   );
 };
