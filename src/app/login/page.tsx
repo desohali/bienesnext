@@ -24,7 +24,7 @@ const App: React.FC = () => {
   const router = useRouter();
   const usuario = useSelector((state: any) => state.user.user);
   const dispatch = useDispatch();
-  dispatch(setUser(JSON.parse(localStorage.getItem("usuario") || "{}")));
+  dispatch(setUser(JSON.parse(window.localStorage.getItem("usuario") || "{}")));
 
 
   const [loading, setLoading] = React.useState(true);
@@ -51,7 +51,7 @@ const App: React.FC = () => {
       <Col xs={20} sm={18} md={14} lg={12}>
         <Card hoverable style={{ width: "100%" }} title={<Text strong>Autenticación</Text>} >
           <Form {...layout} name="login-form" initialValues={{ remember: true }} onFinish={(values) => {
-            localStorage.setItem("usuario", JSON.stringify(values));
+            window.localStorage.setItem("usuario", JSON.stringify(values));
             dispatch(setUser(values));
           }} requiredMark={customizeRequiredMark}>
             <Form.Item label={<Text>Usuario</Text>} name="usuario" rules={[{ required: true, message: 'Por favor ingrese usuario!' }]}>
