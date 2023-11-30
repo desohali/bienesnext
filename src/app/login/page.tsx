@@ -23,9 +23,11 @@ const App: React.FC = () => {
 
   const router = useRouter();
   const usuario = useSelector((state: any) => state.user.user);
-  const dispatch = useDispatch();
-  dispatch(setUser(JSON.parse(window.localStorage.getItem("usuario") || "{}")));
 
+  const dispatch = useDispatch();
+  React.useEffect(() => {
+    dispatch(setUser(JSON.parse(window.localStorage.getItem("usuario") || "{}")));
+  }, []);
 
   const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
