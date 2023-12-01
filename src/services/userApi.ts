@@ -5,22 +5,32 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const userApi = createApi({
   reducerPath: 'userApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:4000/enventario'
+    baseUrl: 'http://localhost:4000/'
   }),
   // keepUnusedDataFor: 3,
   endpoints: (builder) => ({
     registrarRifa: builder.mutation({
       query: (variables) => {
         return {
-          url: '',
+          url: 'registrarRifa',
           method: 'post',
           body: variables,
-          // headers: { uid: variables.name },
+          headers: { uid: "token" },
         }
       },
       transformResponse: (response: any, meta, arg) => response.data,
     }),
-
+    listarRifa: builder.query({
+      query: (variables) => {
+        return {
+          url: 'listarRifas',
+          method: 'get',
+          // body: variables,// get no lleva body
+          headers: { uid: "token" },
+        }
+      },
+      //transformResponse: (response: any, meta, arg) => response.data,
+    }),
   }),
 });
 
@@ -28,4 +38,5 @@ export const userApi = createApi({
 // auto-generated based on the defined endpoints
 export const {
   useRegistrarRifaMutation,
+  useListarRifaQuery
 } = userApi;

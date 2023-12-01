@@ -18,6 +18,7 @@ export default function RootLayout({
 
   return (
     <html lang="es">
+      <meta name="theme-color" content="#001529" />
       <body className={inter.className}>
         <ProviderReduxToolkit>{children}</ProviderReduxToolkit>
       </body>

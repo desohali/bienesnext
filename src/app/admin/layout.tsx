@@ -70,7 +70,7 @@ const App: React.FC = ({ children }: any) => {
   }
 
   return (
-    <Layout className="layout" style={{height:"100vh" }}>
+    <Layout className="layout" style={{ minHeight: "100vh" }}>
       <Header style={{ display: 'flex', alignItems: 'center' }}>
         <div className="demo-logo" />
         <Menu
@@ -81,11 +81,11 @@ const App: React.FC = ({ children }: any) => {
           onClick={showDefaultDrawer}
         />
         <Space direction="vertical" style={{ margin: "auto" }}>
-          <Title style={{ color: "white" }} level={3}>Rifa el medallón</Title>
+          <Title style={{ color: "white", marginBottom: "4px" }} level={3}>Rifa el medallón</Title>
         </Space>
 
       </Header>
-      <Content style={{ padding: '0 24px' }}>
+      <Content style={{ padding: '0 12px' }}>
         <Drawer
           title={`${size} Drawer`}
           placement="left"
@@ -110,7 +110,7 @@ const App: React.FC = ({ children }: any) => {
             )
           }))}
           style={{ margin: '16px 0' }} />
-        <div className="site-layout-content" style={{ background: colorBgContainer, padding:"12px"}}>
+        <div className="site-layout-content" style={{ background: colorBgContainer, padding: "12px" }}>
           {children}
         </div>
       </Content>

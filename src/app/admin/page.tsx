@@ -4,13 +4,31 @@ import { Button, Col, Flex, Row } from 'antd';
 import FormRifa from '@/components/FormRifa';
 import { useDispatch, useSelector } from 'react-redux';
 import { PlusOutlined } from '@ant-design/icons';
-import { setOpenFormRifa } from '@/features/adminSlice';
+import { setIsRifa, setListaDeRifas, setOpenFormRifa } from '@/features/adminSlice';
 import CardRifa from '@/components/CardRifa';
+import { useListarRifaQuery } from '@/services/userApi';
+
 
 const App: React.FC = () => {
-  const { menuButtonKey, openFormRifa } = useSelector((state: any) => state.admin);
+
   const dispatch = useDispatch();
-  const style: React.CSSProperties = { padding: '8px 0' };
+  const { listaDeRifas, isRifa } = useSelector((state: any) => state.admin);
+
+  const { data, error, isLoading, refetch } = useListarRifaQuery({});
+  React.useEffect(() => {
+    if (data) {
+      dispatch(setListaDeRifas(data));
+    }
+  }, [data]);
+
+  React.useEffect(() => {
+    if (isRifa) {
+      refetch();
+    }
+  }, [isRifa]);
+
+
+
   return (
     <React.Suspense>
       <Row gutter={16}>
@@ -18,7 +36,7 @@ const App: React.FC = () => {
 
         </Col>
         <Col className="gutter-row" xs={24} sm={16} md={16} lg={8}>
-          <Flex vertical gap="small" style={{ width: '100%' }}>
+          <Flex vertical gap="small" style={{ width: '100%', marginBottom: '12px' }}>
             <Button type="primary" onClick={() => dispatch(setOpenFormRifa(true))} icon={<PlusOutlined />}>
               Registrar rifa
             </Button>
@@ -29,10 +47,10 @@ const App: React.FC = () => {
 
         </Col>
       </Row>
-      <Row gutter={16}>
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(() => (
+      <Row gutter={[12, 12]}>
+        {listaDeRifas.map((rifa: any) => (
           <Col className="gutter-row" xs={12} sm={12} md={8} lg={6}>
-            <CardRifa />
+            <CardRifa rifa={rifa} />
           </Col>
         ))}
 

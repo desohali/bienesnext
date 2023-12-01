@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, Col, ColorPicker, DatePicker, Drawer, Flex, Form, Input, InputNumber, Row, Select, Space, Tag } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { setOpenFormRifa } from '@/features/adminSlice';
+import { setIsRifa, setOpenFormRifa } from '@/features/adminSlice';
 import { useRegistrarRifaMutation } from '@/services/userApi';
 import swal from 'sweetalert';
 
@@ -20,11 +20,15 @@ const customizeRequiredMark = (label: React.ReactNode, { required }: { required:
 );
 
 const FormRifa: React.FC = () => {
-  const { openFormRifa } = useSelector((state: any) => state.admin);
+
+  const [form] = Form.useForm();
+
   const dispatch = useDispatch();
+  const { openFormRifa } = useSelector((state: any) => state.admin);
 
   const style: React.CSSProperties = { width: '100%' };
   const [registrarRifa, { data, error, isLoading }] = useRegistrarRifaMutation();
+
 
   return (
     <>
@@ -39,18 +43,31 @@ const FormRifa: React.FC = () => {
           },
         }}>
         <Form
+          form={form}
           {...layout}
-          style={{ width: "100%" }}
           name="login-form"
           layout="vertical"
+          style={{ width: "100%" }}
           requiredMark={customizeRequiredMark}
+          initialValues={{
+            nombre: "",
+            fecha: "",
+            ganador: undefined,
+            cantidadGanadores: undefined,
+            premio: undefined,
+            descripcion: "",
+            color: ""
+          }}
           onFinish={async (values) => {
             await registrarRifa({
               ...values,
-              color: "teal",
-              fecha: values.fecha.format('YYYY/MM/DD'),
+              fecha: values.fecha.format('YYYY-MM-DD'),
             });
-            swal("", "Se registro correctamente!", "success");
+            dispatch(setIsRifa(true));
+            dispatch(setOpenFormRifa(false));
+            setTimeout(() => { dispatch(setIsRifa(false)) }, 10);
+            form.resetFields();
+            swal("", "Rifa registrada!", "success");
           }} >
           <Row gutter={16}>
             <Col xs={12} sm={12} md={12} lg={12}>
@@ -94,6 +111,23 @@ const FormRifa: React.FC = () => {
 
           </Row>
           <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="premio"
+                label="Premio"
+                rules={[{ required: true, message: 'Por favor, ingrese premio' }]}
+              >
+                <InputNumber placeholder="Premio" style={style} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="color" label="Color del ticket">
+                {/* <ColorPicker /> */}
+                <Input type='color' placeholder="1N° ganador" style={style} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
             <Col span={24}>
               <Form.Item
                 name="descripcion"
@@ -103,13 +137,7 @@ const FormRifa: React.FC = () => {
               </Form.Item>
             </Col>
           </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="color" label="Color del ticket">
-                <ColorPicker />
-              </Form.Item>
-            </Col>
-          </Row>
+
           <Row gutter={16}>
             <Col span={24}>
               <Flex vertical gap="small" style={{ width: '50%', margin: "auto" }}>
