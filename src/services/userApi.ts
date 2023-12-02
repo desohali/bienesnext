@@ -5,7 +5,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const userApi = createApi({
   reducerPath: 'userApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://yocreoquesipuedohacerlo.com/'
+    baseUrl: 'http://localhost:4000/'
   }),
   // keepUnusedDataFor: 3,
   endpoints: (builder) => ({
@@ -31,6 +31,17 @@ export const userApi = createApi({
       },
       //transformResponse: (response: any, meta, arg) => response.data,
     }),
+    buscarRifa: builder.mutation({
+      query: (variables) => {
+        return {
+          url: 'buscarRifa',
+          method: 'post',
+          body: variables,
+          headers: { uid: "token" },
+        }
+      },
+      //transformResponse: (response: any, meta, arg) => response.data,
+    }),
   }),
 });
 
@@ -38,5 +49,6 @@ export const userApi = createApi({
 // auto-generated based on the defined endpoints
 export const {
   useRegistrarRifaMutation,
-  useListarRifaQuery
+  useListarRifaQuery,
+  useBuscarRifaMutation
 } = userApi;

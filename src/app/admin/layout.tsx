@@ -11,12 +11,14 @@ import { Layout, Menu, theme, Spin, Breadcrumb, Drawer, Space, DrawerProps, Typo
 import { useDispatch, useSelector } from 'react-redux';
 import { setMenuButtonKey } from '@/features/adminSlice';
 import { Footer } from 'antd/es/layout/layout';
+import { useRouter } from 'next/navigation';
 
 const { Title } = Typography;
 const { Header, Content } = Layout;
 
 const App: React.FC = ({ children }: any) => {
 
+  const router = useRouter();
   const dispatch = useDispatch();
   const menuButtonKey = useSelector((state: any) => state.admin.menuButtonKey);
 
@@ -26,6 +28,7 @@ const App: React.FC = ({ children }: any) => {
   }, []);
 
   const handleMenuClick = (e: any) => {
+    router.push('/admin');
     dispatch(setMenuButtonKey(e.key));
     setOpen(false);
   };

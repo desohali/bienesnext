@@ -1,16 +1,17 @@
 "use client";
 import React from 'react';
 import { Result, Spin } from 'antd';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
+
 
 const App: React.FC = () => {
 
-  /* const router = useRouter(); */
+  const router = useRouter();
 
   const [loading, setloading] = React.useState<Boolean>(true);
   React.useEffect(() => {
     setloading(false);
-    /* router.push('/admin'); */
+    router.push('/admin');
   }, []);
 
   if (loading) {

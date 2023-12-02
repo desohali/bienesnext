@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
-import { EditOutlined, EllipsisOutlined, SettingOutlined, SketchOutlined } from '@ant-design/icons';
-import { Avatar, Card } from 'antd';
+import { EyeOutlined, EditOutlined, CloudDownloadOutlined } from '@ant-design/icons';
+import { Avatar, Button, Card, Tooltip } from 'antd';
 import { useRouter } from 'next/navigation';
 
 const { Meta } = Card;
@@ -28,7 +28,6 @@ const CardRifa: React.FC<{ rifa: any }> = ({ rifa }: any) => {
       ctx.fillRect(227.5, 40, 105, 25);
       // Dibuja el cuadrado para taparel qr
       ctx.font = "bold 48px serif";
-
       ctx.fillStyle = "white";
       ctx.fillRect(227.5, 75, 105, 105);
       // Dibuja el texto en el qr
@@ -53,9 +52,21 @@ const CardRifa: React.FC<{ rifa: any }> = ({ rifa }: any) => {
       style={{ width: "100%" }}
       cover={<canvas id={rifa._id} height={213} width={341} style={{ borderRadius: ".5rem .5rem 0 0" }}></canvas>}
       actions={[
-        <SettingOutlined key="setting" />,
-        <EditOutlined key="edit" />,
-        <EllipsisOutlined key="ellipsis" />,
+        <Tooltip title="Editar">
+          <Button type="primary" onClick={(e) => {
+            e.stopPropagation();
+          }} shape="circle" icon={<EditOutlined />} />
+        </Tooltip>,
+        <Tooltip title="Descargar">
+          <Button type="primary" onClick={(e) => {
+            e.stopPropagation();
+          }} shape="circle" icon={<CloudDownloadOutlined />} />
+        </Tooltip>,
+        <Tooltip title="2N° ganadores">
+          <Button type="primary" onClick={(e) => {
+            e.stopPropagation();
+          }} shape="circle" icon={<EyeOutlined />} />
+        </Tooltip>,
       ]}
     >
       <Meta

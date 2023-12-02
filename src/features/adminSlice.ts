@@ -4,6 +4,7 @@ const initialState: any = {
   menuButtonKey: "Rifas",
   openFormRifa: false,
   listaDeRifas: [],
+  rifaDetalles: null,
   isRifa: false
 };
 
@@ -23,10 +24,19 @@ export const adminSlice = createSlice({
     setIsRifa: (state, action) => {
       state.isRifa = action.payload;
     },
+    setRifaDetalles: (state, action) => {
+      state.rifaDetalles = action.payload;
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { setMenuButtonKey, setOpenFormRifa, setListaDeRifas, setIsRifa } = adminSlice.actions;
+export const {
+  setMenuButtonKey,
+  setOpenFormRifa,
+  setListaDeRifas,
+  setIsRifa,
+  setRifaDetalles
+} = adminSlice.actions;
 
 export default adminSlice.reducer;
