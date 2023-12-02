@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, Col, ColorPicker, DatePicker, Drawer, Flex, Form, Input, InputNumber, Row, Select, Space, Tag } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { setIsRifa, setOpenFormRifa } from '@/features/adminSlice';
+import {  setIsRifa, setOpenFormRifa } from '@/features/adminSlice';
 import { useRegistrarRifaMutation } from '@/services/userApi';
 import swal from 'sweetalert';
 
@@ -19,12 +19,14 @@ const customizeRequiredMark = (label: React.ReactNode, { required }: { required:
   </>
 );
 
-const FormRifa: React.FC = () => {
-
-  const [form] = Form.useForm();
+const FormRifa: React.FC<{ formRifa: any }> = ({ formRifa }) => {
 
   const dispatch = useDispatch();
+
   const { openFormRifa } = useSelector((state: any) => state.admin);
+
+  const existeIdRifa = Boolean(formRifa.getFieldValue("_id"));
+
 
   const style: React.CSSProperties = { width: '100%' };
   const [registrarRifa, { data, error, isLoading }] = useRegistrarRifaMutation();
@@ -33,7 +35,7 @@ const FormRifa: React.FC = () => {
   return (
     <>
       <Drawer
-        title="Crear una nueva rifa"
+        title={`${existeIdRifa ? 'Actualizar' : 'Registar'} rifa`}
         width={500}
         onClose={() => dispatch(setOpenFormRifa(false))}
         open={openFormRifa}
@@ -43,13 +45,14 @@ const FormRifa: React.FC = () => {
           },
         }}>
         <Form
-          form={form}
+          form={formRifa}
           {...layout}
           name="login-form"
           layout="vertical"
           style={{ width: "100%" }}
           requiredMark={customizeRequiredMark}
           initialValues={{
+            _id: "",
             nombre: "",
             fecha: "",
             ganador: undefined,
@@ -59,18 +62,24 @@ const FormRifa: React.FC = () => {
             color: ""
           }}
           onFinish={async (values) => {
-            await registrarRifa({
-              ...values,
-              fecha: values.fecha.format('YYYY-MM-DD'),
-            });
+            /* console.log('values', values);
+            return; */
+            await registrarRifa(values);
             dispatch(setIsRifa(true));
             dispatch(setOpenFormRifa(false));
             setTimeout(() => { dispatch(setIsRifa(false)) }, 10);
-            form.resetFields();
-            swal("", "Rifa registrada!", "success");
+            formRifa.resetFields();
+            swal("", `Rifa ${existeIdRifa ? 'Actualizada' : 'Registrada'}!`, "success");
           }} >
           <Row gutter={16}>
             <Col xs={12} sm={12} md={12} lg={12}>
+              <Form.Item
+                name="_id"
+                label="_id"
+                style={{ display: "none" }}
+              >
+                <Input placeholder="_id" />
+              </Form.Item>
               <Form.Item
                 name="nombre"
                 label="Nombre"
@@ -85,7 +94,7 @@ const FormRifa: React.FC = () => {
                 label="Fecha"
                 rules={[{ required: true, message: 'Por favor, ingrese fecha' }]}
               >
-                <DatePicker placeholder="Fecha" style={style} />
+                <Input type='date' placeholder="Fecha" style={style} />
               </Form.Item>
             </Col>
           </Row>
@@ -142,7 +151,7 @@ const FormRifa: React.FC = () => {
             <Col span={24}>
               <Flex vertical gap="small" style={{ width: '50%', margin: "auto" }}>
                 <Button loading={isLoading} type="primary" block htmlType="submit">
-                  Registar
+                  {existeIdRifa ? 'Actualizar' : 'Registar'}
                 </Button>
               </Flex>
             </Col>

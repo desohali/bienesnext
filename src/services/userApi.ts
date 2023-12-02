@@ -42,6 +42,28 @@ export const userApi = createApi({
       },
       //transformResponse: (response: any, meta, arg) => response.data,
     }),
+    listarSegundosGanadores: builder.mutation({
+      query: (variables) => {
+        return {
+          url: 'listarSegundosGanadores',
+          method: 'post',
+          body: variables,
+          headers: { uid: "token" },
+        }
+      },
+      //transformResponse: (response: any, meta, arg) => response.data,
+    }),
+    buscarBoleto: builder.mutation({
+      query: (variables) => {
+        return {
+          url: 'buscarBoleto',
+          method: 'post',
+          body: variables,
+          headers: { uid: "token" },
+        }
+      },
+      //transformResponse: (response: any, meta, arg) => response.data,
+    }),
   }),
 });
 
@@ -50,5 +72,7 @@ export const userApi = createApi({
 export const {
   useRegistrarRifaMutation,
   useListarRifaQuery,
-  useBuscarRifaMutation
+  useBuscarRifaMutation,
+  useListarSegundosGanadoresMutation,
+  useBuscarBoletoMutation
 } = userApi;

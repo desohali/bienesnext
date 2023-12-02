@@ -1,11 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { Form } from 'antd';
 
 const initialState: any = {
   menuButtonKey: "Rifas",
   openFormRifa: false,
+  openFormBoleto: false,
   listaDeRifas: [],
   rifaDetalles: null,
-  isRifa: false
+  isRifa: false,
+  test:null
 };
 
 export const adminSlice = createSlice({
@@ -27,6 +30,12 @@ export const adminSlice = createSlice({
     setRifaDetalles: (state, action) => {
       state.rifaDetalles = action.payload;
     },
+    setOpenFormBoleto: (state, action) => {
+      state.openFormBoleto = action.payload;
+    },
+    setTest: (state, action) => {
+      state.test = action.payload;
+    },
   },
 });
 
@@ -36,7 +45,9 @@ export const {
   setOpenFormRifa,
   setListaDeRifas,
   setIsRifa,
-  setRifaDetalles
+  setRifaDetalles,
+  setOpenFormBoleto,
+  setTest
 } = adminSlice.actions;
 
 export default adminSlice.reducer;

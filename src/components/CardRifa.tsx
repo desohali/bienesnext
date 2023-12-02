@@ -1,15 +1,18 @@
 "use client";
 import React from 'react';
 import { EyeOutlined, EditOutlined, CloudDownloadOutlined } from '@ant-design/icons';
-import { Avatar, Button, Card, Tooltip } from 'antd';
+import { Button, Card, Tooltip } from 'antd';
 import { useRouter } from 'next/navigation';
+import { setOpenFormBoleto, setOpenFormRifa, setRifaDetalles } from '@/features/adminSlice';
+import { useDispatch } from 'react-redux';
+
 
 const { Meta } = Card;
 
-const CardRifa: React.FC<{ rifa: any }> = ({ rifa }: any) => {
-
+const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: any) => {
 
   const router = useRouter();
+  const dispatch = useDispatch();
 
   React.useEffect(() => {
 
@@ -40,8 +43,31 @@ const CardRifa: React.FC<{ rifa: any }> = ({ rifa }: any) => {
       ctx.fillText(rifa.fecha, 245, 60);
     };
     imagen.src = '../../ticket_mini_transparente.png';
-  }, [rifa._id]);
+  }, [rifa._id, rifa.color]);
 
+
+  const [loading, setloading] = React.useState(false);
+  const descargarBoletos = async (rifa: any) => {
+    setloading(true);
+    const formData = new FormData();
+    formData.append("_idRifa", rifa._id);
+    const response = await fetch(`https://yocreoquesipuedohacerlo.com/descargarBoletos`, {
+      method: "post",
+      body: formData
+    });
+    const blob = await response.blob();
+    // Crea un enlace temporal para descargar el archivo
+    const url = window.URL.createObjectURL(new Blob([blob]));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Rifa-${rifa.fecha}.pdf`; // Nombre del archivo que se descargará
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+
+    setloading(false);
+  }
 
   return (
     <Card
@@ -55,16 +81,22 @@ const CardRifa: React.FC<{ rifa: any }> = ({ rifa }: any) => {
         <Tooltip title="Editar">
           <Button type="primary" onClick={(e) => {
             e.stopPropagation();
+            dispatch(setOpenFormRifa(true));
+            formRifa.resetFields();
+            formRifa.setFieldsValue(rifa);
           }} shape="circle" icon={<EditOutlined />} />
         </Tooltip>,
         <Tooltip title="Descargar">
-          <Button type="primary" onClick={(e) => {
+          <Button loading={loading} type="primary" onClick={async (e) => {
             e.stopPropagation();
+            await descargarBoletos(rifa);
           }} shape="circle" icon={<CloudDownloadOutlined />} />
         </Tooltip>,
         <Tooltip title="2N° ganadores">
           <Button type="primary" onClick={(e) => {
             e.stopPropagation();
+            dispatch(setOpenFormBoleto(true));
+            dispatch(setRifaDetalles(rifa));
           }} shape="circle" icon={<EyeOutlined />} />
         </Tooltip>,
       ]}

@@ -3,7 +3,7 @@ import React from 'react';
 import swal from 'sweetalert';
 import Marquee from 'react-fast-marquee';
 import { setRifaDetalles } from '@/features/adminSlice';
-import { useBuscarRifaMutation } from '@/services/userApi';
+import { useBuscarBoletoMutation } from '@/services/userApi';
 import { Alert, Button, Col, Flex, Row, Spin, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 const { Title } = Typography;
@@ -21,9 +21,9 @@ const page = ({ params }: any) => {
   const dispatch = useDispatch();
   const { rifaDetalles } = useSelector((state: any) => state.admin);
 
-  const [buscarRifa, { data, error, isLoading }] = useBuscarRifaMutation();
+  const [buscarRifa, { data, error, isLoading }] = useBuscarBoletoMutation();
   React.useEffect(() => {
-    buscarRifa({ _id: params._idRifa })
+    buscarRifa({ _id: params._idBoleto })
       .then((rifa: any) => {
         dispatch(setRifaDetalles(rifa.data))
       });
