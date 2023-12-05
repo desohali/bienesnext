@@ -125,3 +125,9 @@ a {
 .arqueado h3 {
   transform: perspective(500px) rotateX(60deg);
 }
+
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: .5rem !important;
+}

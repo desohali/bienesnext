@@ -69,9 +69,9 @@ const page = ({ params }: any) => {
       cordenadas.x += 95;
     }
 
-    return () => {
+    /* return () => {
       detenerJuego();
-    }
+    } */
 
   }, [data]);
 
@@ -110,6 +110,8 @@ const page = ({ params }: any) => {
   }, [iniciarJuegoTimeout, rifaDetalles]);
 
   const detenerJuego = React.useCallback(() => {
+    console.log('rifaDetalles', rifaDetalles)
+    
     clearTimeout(iniciarJuegoTimeout);
     cordenadas = { x: 525, y: 525 };
     ctx.clearRect(0, 0, width, height);

@@ -3,8 +3,9 @@ import React from 'react';
 import { EyeOutlined, EditOutlined, CloudDownloadOutlined } from '@ant-design/icons';
 import { Button, Card, Tooltip } from 'antd';
 import { useRouter } from 'next/navigation';
-import { setOpenFormBoleto, setOpenFormRifa, setRifaDetalles } from '@/features/adminSlice';
+import { setListaDeBoletos, setOpenFormBoleto, setOpenFormRifa, setRifaDetalles } from '@/features/adminSlice';
 import { useDispatch } from 'react-redux';
+import { useListarBoletosMutation } from '@/services/userApi';
 
 
 const { Meta } = Card;
@@ -13,6 +14,12 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
 
   const router = useRouter();
   const dispatch = useDispatch();
+
+  const [listarBoletos, {
+    data: dataMu,
+    error: errorMU,
+    isLoading: isLoadingMu
+  }] = useListarBoletosMutation();
 
   React.useEffect(() => {
 
@@ -51,7 +58,7 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
     setloading(true);
     const formData = new FormData();
     formData.append("_idRifa", rifa._id);
-    const response = await fetch(`https://yocreoquesipuedohacerlo.com/descargarBoletos`, {
+    const response = await fetch(`http://localhost:4000/descargarBoletos`, {
       method: "post",
       body: formData
     });
@@ -93,8 +100,11 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
           }} shape="circle" icon={<CloudDownloadOutlined />} />
         </Tooltip>,
         <Tooltip title="2N° ganadores">
-          <Button type="primary" onClick={(e) => {
+          <Button type="primary" onClick={async (e) => {
             e.stopPropagation();
+            const { data = [] }: any = await listarBoletos({ _idRifa: rifa._id });
+            dispatch(setListaDeBoletos(data));
+
             dispatch(setOpenFormBoleto(true));
             dispatch(setRifaDetalles(rifa));
           }} shape="circle" icon={<EyeOutlined />} />

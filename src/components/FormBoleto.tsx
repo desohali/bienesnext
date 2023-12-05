@@ -1,40 +1,47 @@
 "use client"
 import React, { useRef } from 'react';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Drawer, Flex, Form, Input, InputNumber, Space } from 'antd';
+import { AutoComplete, Button, Drawer, Flex, Form, Input, InputNumber, List, Space } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { setOpenFormBoleto, setTest } from '@/features/adminSlice';
-import { useListarSegundosGanadoresMutation } from '@/services/userApi';
+import { setListaDeBoletos, setOpenFormBoleto } from '@/features/adminSlice';
+import { useListarBoletosMutation, useListarSegundosGanadoresMutation, useRegistrarPremioBoletosMutation } from '@/services/userApi';
+import swal from 'sweetalert';
 
-const onFinish = (values: any) => {
-  console.log('Received values of form:', values);
-};
 
 const FormBoleto: React.FC = () => {
 
   const dispatch = useDispatch();
 
-  const { openFormBoleto, rifaDetalles } = useSelector((state: any) => state.admin);
-  const [listarSegundosGanadores, { data, error, isLoading }] = useListarSegundosGanadoresMutation();
+  const [value, setValue] = React.useState('');
+
+  const { openFormBoleto, rifaDetalles, listaDeBoletos } = useSelector((state: any) => state.admin);
+  const [listarBoletos, {
+    data: dataMu,
+    error: errorMU,
+    isLoading: isLoadingMu
+  }] = useListarBoletosMutation();
+  const [registrarPremioBoletos, { isLoading: isLoadingRegistrar }] = useRegistrarPremioBoletosMutation();
+
+  const boletosConPremio = listaDeBoletos
+    .filter((b: any) => (Boolean(b.premio) && b.estadoMenor));
+
+  const boletosSinPremio = listaDeBoletos
+    .filter(() => true)
+    .map((b: any) => ({ value: b.premioMenor }));
+
 
   const [form] = Form.useForm();
   const refBoletos = React.useRef<any>();
 
-  React.useEffect(() => {
-    if (rifaDetalles) {
-      listarSegundosGanadores(rifaDetalles).then((response: any) => {
-        response.data.forEach((b: any) => {
-          if (typeof refBoletos.current == "function") {
-            refBoletos.current({ ...b, premio: 100 });
-          }
-        });
-      });
-    }
-    form.resetFields();
-    return () => {
+
+  const onFinish = (values: any) => {
+    registrarPremioBoletos({ boletos: JSON.stringify(values.boletos) }).then(async () => {
+      swal("", "Los boletos se actualizaron correctamente!", "success");
       form.resetFields();
-    }
-  }, [rifaDetalles]);
+      const { data = [] }: any = await listarBoletos({ _idRifa: rifaDetalles._id });
+      dispatch(setListaDeBoletos(data));
+    })
+  };
 
 
   return (
@@ -45,11 +52,33 @@ const FormBoleto: React.FC = () => {
       open={openFormBoleto}
       style={{ width: "100%", }}
       styles={{
-
         body: {
           paddingBottom: 80,
         },
       }}>
+
+      <AutoComplete
+        allowClear
+        bordered
+        value={value}
+        style={{ width: "100%", marginBottom: "12px" }}
+        options={boletosSinPremio}
+        onSearch={(search) => {
+          setValue(search);
+        }}
+        onSelect={(data) => {
+          const findBoleto = listaDeBoletos.find((b: any) => (b.premioMenor == data));
+          if (findBoleto) {
+            refBoletos.current({ ...findBoleto, premio: "" });
+            setValue("");
+          }
+        }}
+        placeholder="Buscar 2N° ganadores"
+        filterOption={(inputValue, option: any) => {
+          return option!.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+        }}
+      />
+
       <Form
         form={form}
         name="dynamic_form_nest_item"
@@ -97,23 +126,31 @@ const FormBoleto: React.FC = () => {
                     </Space>
                   )
                 })}
-                <Form.Item>
+                {/* <Form.Item>
                   <Button type="dashed" disabled onClick={() => add()} block icon={<PlusOutlined />}>
                     Agregar boleto
                   </Button>
-                </Form.Item>
+                </Form.Item> */}
               </>
             )
           }}
         </Form.List>
         <Form.Item>
           <Flex vertical gap="small" style={{ width: '50%', margin: "auto" }}>
-            <Button type="primary" htmlType="submit" block>
+            <Button loading={isLoadingRegistrar} type="primary" htmlType="submit" block>
               Actualizar
             </Button>
           </Flex>
         </Form.Item>
       </Form>
+
+      <List
+        size="small"
+        header={<div>{`Lista de 2N° ganadores ${boletosConPremio.length}`}</div>}
+        bordered
+        dataSource={boletosConPremio}
+        renderItem={(item: any) => <List.Item>{`Boleto : ${item.premioMenor} Premio: ${item.premio.toFixed(2)}`}</List.Item>}
+      />
     </Drawer>
   )
 };
