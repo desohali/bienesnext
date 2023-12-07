@@ -1,15 +1,10 @@
 "use client";
-import JuegoSecundario from '@/components/JuegoSecundario';
 import { setRifaDetalles } from '@/features/adminSlice';
 import { useActualizarBoletoMutation, useBuscarBoletoMutation } from '@/services/userApi';
-import { Button, Col, Flex, Row } from 'antd';
-import React, { useRef } from 'react';
+import { Col, Row } from 'antd';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { PlusOutlined } from '@ant-design/icons';
-import { useRouter } from 'next/router';
-import swal from 'sweetalert';
 
-const THREE = require('three');
 
 var canvas: any, ctx: any, imagen: any;
 var width = 642, height = 1280;
