@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, Col, ColorPicker, DatePicker, Drawer, Flex, Form, Input, InputNumber, Row, Select, Space, Tag } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import {  setIsRifa, setOpenFormRifa } from '@/features/adminSlice';
+import { setIsRifa, setOpenFormRifa } from '@/features/adminSlice';
 import { useRegistrarRifaMutation } from '@/services/userApi';
 import swal from 'sweetalert';
 
@@ -54,16 +54,13 @@ const FormRifa: React.FC<{ formRifa: any }> = ({ formRifa }) => {
           initialValues={{
             _id: "",
             nombre: "",
-            fecha: "",
+            fecha: new Date().toLocaleDateString().split("/").reverse().map((value: string) => value.padStart(2, "0")).join("-"),
             ganador: undefined,
-            cantidadGanadores: undefined,
             premio: undefined,
             descripcion: "",
-            color: ""
+            color: "#008080"
           }}
           onFinish={async (values) => {
-            /* console.log('values', values);
-            return; */
             await registrarRifa(values);
             dispatch(setIsRifa(true));
             dispatch(setOpenFormRifa(false));
@@ -103,23 +100,19 @@ const FormRifa: React.FC<{ formRifa: any }> = ({ formRifa }) => {
               <Form.Item
                 name="ganador"
                 label="1N° ganador"
-                rules={[{ required: true, message: 'Por favor, ingrese 1N° ganador' }]}
+                rules={[
+                  { required: true, message: 'Por favor, ingrese 1N° ganador' },
+                  {
+                    validator: (_, value) => {
+                      if (value && value.toString().length == 4) return Promise.resolve();
+                      return Promise.reject("1N° ganador, debe tener 4 digitos");
+                    }
+                  }
+                ]}
               >
                 <InputNumber placeholder="1N° ganador" style={style} />
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item
-                name="cantidadGanadores"
-                label="2N° ganadores"
-                rules={[{ required: true, message: 'Por favor, ingrese 2N° ganadores' }]}
-              >
-                <InputNumber placeholder="2N° ganadores" style={style} />
-              </Form.Item>
-            </Col>
-
-          </Row>
-          <Row gutter={16}>
             <Col span={12}>
               <Form.Item
                 name="premio"
@@ -129,23 +122,24 @@ const FormRifa: React.FC<{ formRifa: any }> = ({ formRifa }) => {
                 <InputNumber placeholder="Premio" style={style} />
               </Form.Item>
             </Col>
+          </Row>
+          <Row gutter={16}>
+
             <Col span={12}>
               <Form.Item name="color" label="Color del ticket">
-                {/* <ColorPicker /> */}
                 <Input type='color' placeholder="1N° ganador" style={style} />
               </Form.Item>
             </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={24}>
+            <Col span={12}>
               <Form.Item
                 name="descripcion"
                 label="Descripción"
               >
-                <Input.TextArea rows={2} placeholder="Descripción" />
+                <Input.TextArea rows={1} placeholder="Descripción" />
               </Form.Item>
             </Col>
           </Row>
+
 
           <Row gutter={16}>
             <Col span={24}>

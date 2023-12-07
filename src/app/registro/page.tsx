@@ -3,6 +3,7 @@ import React from 'react';
 import { Button, Col, QRCode, Row } from 'antd';
 import swal from 'sweetalert';
 var ObjectID = require("bson-objectid");
+const QRCodeR = require('qrcode');
 
 const downloadQRCode = () => {
   const canvas = document.getElementById('myqrcode')?.querySelector<HTMLCanvasElement>('canvas');
@@ -55,7 +56,7 @@ const App: React.FC = () => {
           const formData = new FormData();
           formData.append("codigos", JSON.stringify(codigos));
 
-          const response = await fetch("https://yocreoquesipuedohacerlo.com/registrarTickets", {
+          const response = await fetch("http://localhost:4000/registrarTickets", {
             method: "post",
             body: formData
           });

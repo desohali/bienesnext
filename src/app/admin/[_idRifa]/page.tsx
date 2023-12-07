@@ -3,7 +3,7 @@ import React from 'react';
 import swal from 'sweetalert';
 import Marquee from 'react-fast-marquee';
 import { setRifaDetalles } from '@/features/adminSlice';
-import { useBuscarBoletoMutation } from '@/services/userApi';
+import { useBuscarBoletoMutation, useBuscarRifaMutation } from '@/services/userApi';
 import { Alert, Button, Col, Flex, Row, Spin, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 const { Title } = Typography;
@@ -21,9 +21,9 @@ const page = ({ params }: any) => {
   const dispatch = useDispatch();
   const { rifaDetalles } = useSelector((state: any) => state.admin);
 
-  const [buscarRifa, { data, error, isLoading }] = useBuscarBoletoMutation();
+  const [buscarRifa, { data, error, isLoading }] = useBuscarRifaMutation();
   React.useEffect(() => {
-    buscarRifa({ _id: params._idBoleto })
+    buscarRifa({ _id: params._idRifa })
       .then((rifa: any) => {
         dispatch(setRifaDetalles(rifa.data))
       });
@@ -110,7 +110,6 @@ const page = ({ params }: any) => {
   }, [iniciarJuegoTimeout, rifaDetalles]);
 
   const detenerJuego = React.useCallback(() => {
-    console.log('rifaDetalles', rifaDetalles)
     
     clearTimeout(iniciarJuegoTimeout);
     cordenadas = { x: 525, y: 525 };

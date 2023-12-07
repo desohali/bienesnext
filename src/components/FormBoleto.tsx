@@ -1,7 +1,7 @@
 "use client"
 import React, { useRef } from 'react';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { AutoComplete, Button, Drawer, Flex, Form, Input, InputNumber, List, Space } from 'antd';
+import { AutoComplete, Button, Drawer, Flex, Form, Input, InputNumber, List, Select, Space } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { setListaDeBoletos, setOpenFormBoleto } from '@/features/adminSlice';
 import { useListarBoletosMutation, useListarSegundosGanadoresMutation, useRegistrarPremioBoletosMutation } from '@/services/userApi';
@@ -23,10 +23,9 @@ const FormBoleto: React.FC = () => {
   const [registrarPremioBoletos, { isLoading: isLoadingRegistrar }] = useRegistrarPremioBoletosMutation();
 
   const boletosConPremio = listaDeBoletos
-    .filter((b: any) => (Boolean(b.premio) && b.estadoMenor));
+    .filter((b: any) => Boolean(b.premio));
 
   const boletosSinPremio = listaDeBoletos
-    .filter(() => true)
     .map((b: any) => ({ value: b.premioMenor }));
 
 
@@ -35,6 +34,7 @@ const FormBoleto: React.FC = () => {
 
 
   const onFinish = (values: any) => {
+
     registrarPremioBoletos({ boletos: JSON.stringify(values.boletos) }).then(async () => {
       swal("", "Los boletos se actualizaron correctamente!", "success");
       form.resetFields();
@@ -46,7 +46,7 @@ const FormBoleto: React.FC = () => {
 
   return (
     <Drawer
-      title={`2N° ganadores : ${rifaDetalles?.cantidadGanadores}`}
+      title="2N° ganadores"
       width={500}
       onClose={() => dispatch(setOpenFormBoleto(false))}
       open={openFormBoleto}
@@ -118,9 +118,22 @@ const FormBoleto: React.FC = () => {
                       <Form.Item
                         {...restField}
                         name={[name, 'premio']}
+                        style={{ minWidth: "120px" }}
                         rules={[{ required: true, message: 'Ingrese premio' }]}
                       >
-                        <InputNumber placeholder="Premio" />
+                        <Select defaultValue="5000">
+                          <Select.Option value="5000">5 mil</Select.Option>
+                          <Select.Option value="10000">10 mil</Select.Option>
+                          <Select.Option value="20000">20 mil</Select.Option>
+                          <Select.Option value="30000">30 mil</Select.Option>
+                          <Select.Option value="50000">50 mil</Select.Option>
+                          <Select.Option value="80000">80 mil</Select.Option>
+                          <Select.Option value="160000">160 mil</Select.Option>
+                          <Select.Option value="320000">320 mil</Select.Option>
+                          <Select.Option value="600000">600 mil</Select.Option>
+                          <Select.Option value="1200000">1.2 millones</Select.Option>
+                        </Select>
+                        {/* <InputNumber placeholder="Premio" /> */}
                       </Form.Item>
                       <MinusCircleOutlined onClick={() => remove(name)} />
                     </Space>

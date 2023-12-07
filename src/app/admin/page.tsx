@@ -121,7 +121,7 @@ const App: React.FC = () => {
       </Row>
       <Row gutter={[12, 12]}>
         {listaDeRifas.map((rifa: any) => (
-          <Col className="gutter-row" xs={12} sm={12} md={8} lg={6}>
+          <Col key={rifa._id} className="gutter-row" xs={12} sm={12} md={8} lg={6}>
             <CardRifa rifa={rifa} formRifa={formRifa} />
           </Col>
         ))}
