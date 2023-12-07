@@ -56,7 +56,7 @@ const App: React.FC = () => {
           const formData = new FormData();
           formData.append("codigos", JSON.stringify(codigos));
 
-          const response = await fetch("http://localhost:4000/registrarTickets", {
+          const response = await fetch("https://yocreoquesipuedohacerlo.com/registrarTickets", {
             method: "post",
             body: formData
           });

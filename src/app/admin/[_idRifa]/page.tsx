@@ -11,9 +11,9 @@ const { Title } = Typography;
 var canvas: any, ctx: any;
 var numerosInicio = [0, 0, 0, 0];
 var numerosGanadores = [2, 3, 4, 5];
-var cordenadas = { x: 150, y: 525 };// y 100
+var cordenadas = { x: 300, y: 665 };// y 100
 var iniciarJuegoTimeout: any;
-var width = 1024, height = 567;// 130
+var width = 1280, height = 833;// 130
 var imagen: any;
 
 const page = ({ params }: any) => {
@@ -32,9 +32,9 @@ const page = ({ params }: any) => {
 
   React.useEffect(() => {
     if (canvas) {
-      cordenadas = { x: 525, y: 525 };
+      cordenadas = { x: 410, y: 665 };
     } else {
-      cordenadas = { x: 150, y: 525 };
+      cordenadas = { x: 300, y: 665 };
     }
     canvas = document.querySelector("canvas");
     ctx = canvas.getContext("2d");
@@ -45,33 +45,33 @@ const page = ({ params }: any) => {
       // Dibuja la imagen en el canvas
       ctx.drawImage(imagen, 0, 0);
     };
-    imagen.src = '../../juegoMayor1024.png';
+    imagen.src = '../../videos/fondoPremioMayor.png';
 
     // Dibujamos el color de fondo
     ctx.fillStyle = rifaDetalles?.color || "white";
     ctx.fillRect(0, 0, width, height);
 
-    ctx.font = "bold 130px serif";
+    ctx.font = "bold 170px serif";
     ctx.lineWidth = 5;
     ctx.fillStyle = "black";
     ctx.strokeStyle = "white";
 
     for (const numero of numerosInicio) {
-      ctx.fillText("1 ", cordenadas.x, cordenadas.y - 95);
-      ctx.strokeText("1 ", cordenadas.x, cordenadas.y - 95);
+      ctx.fillText("1 ", cordenadas.x, cordenadas.y - 125);
+      ctx.strokeText("1 ", cordenadas.x, cordenadas.y - 125);
 
       ctx.fillText("0 ", cordenadas.x, cordenadas.y);
       ctx.strokeText("0 ", cordenadas.x, cordenadas.y);
 
-      ctx.fillText("9 ", cordenadas.x, cordenadas.y + 95);
-      ctx.strokeText("9 ", cordenadas.x, cordenadas.y + 95);
+      ctx.fillText("9 ", cordenadas.x, cordenadas.y + 125);
+      ctx.strokeText("9 ", cordenadas.x, cordenadas.y + 125);
 
-      cordenadas.x += 95;
+      cordenadas.x += 125;
     }
 
-    /* return () => {
+    return () => {
       detenerJuego();
-    } */
+    }
 
   }, [data]);
 
@@ -80,7 +80,7 @@ const page = ({ params }: any) => {
 
   const iniciarJuego = React.useCallback(() => {
 
-    cordenadas = { x: 525, y: 430 };
+    cordenadas = { x: 410, y: 540 };
     ctx.clearRect(0, 0, width, height);
     // Dibujamos el color de fondo
     ctx.fillStyle = rifaDetalles?.color || "white";
@@ -88,17 +88,17 @@ const page = ({ params }: any) => {
     ctx.fillStyle = "black";
     for (const numero of numerosInicio) {
 
-      cordenadas.y = 430;
+      cordenadas.y = 540;
       const randoms = [Math.floor(Math.random() * 9), Math.floor(Math.random() * 9), Math.floor(Math.random() * 9)];
       ctx.fillText(randoms[0].toString(), cordenadas.x, cordenadas.y);
       ctx.strokeText(randoms[0].toString(), cordenadas.x, cordenadas.y);
-      cordenadas.y += 95;
+      cordenadas.y += 125;
       ctx.fillText(randoms[1].toString(), cordenadas.x, cordenadas.y);
       ctx.strokeText(randoms[1].toString(), cordenadas.x, cordenadas.y);
-      cordenadas.y += 95;
+      cordenadas.y += 125;
       ctx.fillText(randoms[2].toString(), cordenadas.x, cordenadas.y);
       ctx.strokeText(randoms[2].toString(), cordenadas.x, cordenadas.y);
-      cordenadas.x += 95;
+      cordenadas.x += 125;
     }
 
     ctx.drawImage(imagen, 0, 0);
@@ -112,7 +112,7 @@ const page = ({ params }: any) => {
   const detenerJuego = React.useCallback(() => {
     
     clearTimeout(iniciarJuegoTimeout);
-    cordenadas = { x: 525, y: 525 };
+    cordenadas = { x: 410, y: 665 };
     ctx.clearRect(0, 0, width, height);
     // Dibujamos el color de fondo
     ctx.fillStyle = rifaDetalles?.color || "white";
@@ -124,16 +124,16 @@ const page = ({ params }: any) => {
         Math.floor(Math.random() * 9),
         Math.floor(Math.random() * 9),
       ];
-      ctx.fillText(randoms[0].toString(), cordenadas.x, cordenadas.y - 95);
-      ctx.strokeText(randoms[0].toString(), cordenadas.x, cordenadas.y - 95);
+      ctx.fillText(randoms[0].toString(), cordenadas.x, cordenadas.y - 125);
+      ctx.strokeText(randoms[0].toString(), cordenadas.x, cordenadas.y - 125);
 
       ctx.fillText(numero.toString(), cordenadas.x, cordenadas.y);
       ctx.strokeText(numero.toString(), cordenadas.x, cordenadas.y);
 
-      ctx.fillText(randoms[2].toString(), cordenadas.x, cordenadas.y + 95);
-      ctx.strokeText(randoms[2].toString(), cordenadas.x, cordenadas.y + 95);
+      ctx.fillText(randoms[2].toString(), cordenadas.x, cordenadas.y + 125);
+      ctx.strokeText(randoms[2].toString(), cordenadas.x, cordenadas.y + 125);
 
-      cordenadas.x += 95;
+      cordenadas.x += 125;
     }
     ctx.drawImage(imagen, 0, 0);
   }, [iniciarJuegoTimeout, rifaDetalles]);
@@ -161,7 +161,7 @@ const page = ({ params }: any) => {
 
         </Col>
         <Col className="gutter-row" xs={24} sm={24} md={20} lg={16}>
-          <canvas width={1024} height={657} style={{ width: "100%", borderRadius: ".5rem" }}></canvas>
+          <canvas width={width} height={height} style={{ width: "100%", borderRadius: ".5rem" }}></canvas>
         </Col>
         <Col className="gutter-row" xs={24} sm={24} md={2} lg={4}>
           <Flex vertical gap="small" style={{ width: '100%' }}>

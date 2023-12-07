@@ -6,11 +6,169 @@ import { useRouter } from 'next/navigation';
 import { setListaDeBoletos, setOpenFormBoleto, setOpenFormRifa, setRifaDetalles } from '@/features/adminSlice';
 import { useDispatch } from 'react-redux';
 import { useListarBoletosMutation } from '@/services/userApi';
+const { PDFDocument, rgb } = require('pdf-lib');
+const QRCode = require('qrcode');
+
+var pdfDoc: any;
+var canvas: any, imagen: any, ctx: any;
+////////////////////////////////////////////////////////////////////
+const imagenLoaded = (imageBase64: string) => {
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.onload = () => { resolve(img) }
+    img.onerror = err => { throw err }
+    img.src = imageBase64
+  });
+};
+const crearBoleto = async (element: any, ctx: any, /* imagee: any, */ findRifa: any) => {
+  const imageBase64 = await QRCode.toDataURL(`https://bienesnext.vercel.app/juego/${element._id}`, {
+    width: 80,
+    errorCorrectionLevel: 'L',
+    type: 'png',
+    rendererOpts: {
+      quality: 1,
+    }
+  });
+
+  const img = await imagenLoaded(imageBase64);
+
+  ctx.clearRect(0, 0, 341, 213);
+  ctx.fillStyle = findRifa.color;
+  ctx.fillRect(0, 0, 341, 213);
+  ctx.drawImage(imagen, 0, 0/* , 341, 213 */);
+  ctx.fillRect(227.5, 40, 105, 25);
+  ctx.drawImage(img, 220, 70, 120, 120);
+
+  ctx.font = "bold 18px serif";
+  ctx.fillStyle = "black";
+  ctx.fillText(findRifa.fecha, 227.5, 60);
+
+  ctx.font = "bold 24px serif";
+  ctx.fillStyle = findRifa.color;
+  ctx.fillRect(147.5, 87.5, 65, 22.5);
+  ctx.fillStyle = "black";
+  ctx.fillText(element.premioMayor, 155, 105);
+  ctx.fillStyle = findRifa.color;
+  ctx.fillRect(142.5, 140, 65, 22.5);
+  ctx.fillStyle = "black";
+  ctx.fillText(element.premioMenor, 150, 157);
+
+  return pdfDoc.embedPng(canvas.toDataURL("image/png"));
+};
+
+///////////////////////////////////////////////////////////////////
 
 
 const { Meta } = Card;
 
 const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: any) => {
+  const descargarBoletos = async (boletos: any[]) => {
+
+    pdfDoc = await PDFDocument.create();
+
+    let widthPDF = 767.25, heightPDF = 958.5;
+    let page = pdfDoc.addPage([widthPDF, heightPDF]);
+    let x = 0;
+    let y = widthPDF + 32/* - (159.75 * 4) */;
+    let fila = 1;
+    let numeroBoletos = 1;
+
+    const boletosImages: any = [];
+    for (const boleto of boletos) {
+      const imagePng = await crearBoleto(
+        boleto,
+        ctx,
+        rifa
+      );
+      boletosImages.push(imagePng);
+    }
+
+    for (const [i, boletoImage] of boletosImages.entries()) {
+      const jpgDims = boletoImage.scale(0.75);
+
+      page.drawImage(boletoImage, {
+        x: x,
+        y: y,
+        width: jpgDims.width,
+        height: jpgDims.height,
+      });
+
+      if (fila === 3) {
+        x = 0;
+        y -= (jpgDims.height + 0);
+        fila = 1;
+      } else {
+        x += jpgDims.width + 0;
+        fila++;
+      }
+
+      if (numeroBoletos === 18) {
+        x = 0;
+        y = widthPDF + 32/* - (jpgDims.height * 4) */;
+
+        if (i < boletosImages.length - 1) {
+          page = pdfDoc.addPage([widthPDF, heightPDF]);
+        }
+
+        numeroBoletos = 1;
+      } else {
+        numeroBoletos++;
+      }
+    }
+
+    (() => {
+      setloading(false);
+      // Dibuja todo el canvas de color de la rifa
+      ctx.fillStyle = rifa.color;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Dibuja la imagen en el canvas
+      ctx.drawImage(imagen, 0, 0);
+      // Dibuja el rectangulo para tapar la fecha
+      ctx.fillRect(227.5, 40, 105, 25);
+      // Dibuja el cuadrado para taparel qr
+      ctx.font = "bold 48px serif";
+      ctx.fillStyle = "white";
+      ctx.fillRect(227.5, 75, 105, 105);
+      // Dibuja el texto en el qr
+      ctx.fillStyle = rifa.color;
+      ctx.fillText("¿...?", 240, 140);
+
+      // Dibuja el texto de la fecha
+      ctx.font = "bold 16px serif";
+      ctx.fillStyle = "white";
+      ctx.fillText(rifa.fecha, 245, 60);
+    })();
+
+    const pdfBytes = await pdfDoc.save();
+
+    // Crear un Blob con los datos del PDF
+    const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+
+    // Crear una URL a partir del Blob
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    const a = document.createElement('a');
+    a.href = pdfUrl;
+    a.download = `Rifa-${rifa.fecha}.pdf`; // Nombre del archivo que se descargará
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(pdfUrl);
+    // Abrir una nueva pestaña con el PDF
+    // window.open(pdfUrl);
+  }
+
+  React.useEffect(() => {
+    canvas = document.getElementById(rifa._id);
+    ctx = canvas.getContext("2d");
+    // Carga la imagen
+    imagen = new Image();
+    imagen.onload = function () {
+      // Dibuja la imagen en el canvas
+      ctx.drawImage(imagen, 0, 0);
+    };
+    imagen.src = '../../ticket_mini_transparente.png';
+  }, [rifa._id]);
+
 
   const router = useRouter();
   const dispatch = useDispatch();
@@ -23,8 +181,8 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
 
   React.useEffect(() => {
 
-    let canvas: any = document.getElementById(rifa._id);
-    let ctx = canvas.getContext('2d');
+    canvas = document.getElementById(rifa._id);
+    ctx = canvas.getContext('2d');
 
     // Carga la imagen
     let imagen = new Image();
@@ -54,11 +212,11 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
 
 
   const [loading, setloading] = React.useState(false);
-  const descargarBoletos = async (rifa: any) => {
+  /* const descargarBoletos = async (rifa: any) => {
     setloading(true);
     const formData = new FormData();
     formData.append("_idRifa", rifa._id);
-    const response = await fetch(`http://localhost:4000/descargarBoletos`, {
+    const response = await fetch(`https://yocreoquesipuedohacerlo.com/descargarBoletos`, {
       method: "post",
       body: formData
     });
@@ -74,7 +232,7 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
     window.URL.revokeObjectURL(url);
 
     setloading(false);
-  }
+  } */
 
   return (
     <Card
@@ -96,7 +254,11 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
         <Tooltip title="Descargar">
           <Button loading={loading} type="primary" onClick={async (e) => {
             e.stopPropagation();
-            await descargarBoletos(rifa);
+            setloading(true);
+            const { data = [] }: any = await listarBoletos({ _idRifa: rifa._id });
+            /* dispatch(setListaDeBoletos(data)); */
+            await descargarBoletos(data);
+
           }} shape="circle" icon={<CloudDownloadOutlined />} />
         </Tooltip>,
         <Tooltip title="2N° ganadores">
@@ -113,7 +275,6 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
     >
       <Meta
         title={`Premio : ${rifa?.premio.toFixed(2)}`}
-        description={`2N° ganadores : ${rifa?.cantidadGanadores}`}
       />
       <Meta description={`Fecha : ${rifa?.fecha}`} />
       <Meta description={`Nombre : ${rifa?.nombre}`} />
