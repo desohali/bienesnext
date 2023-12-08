@@ -89,15 +89,6 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
         y <= rectY + rectHeight
       ) {
 
-        /* if (isPlaying) {
-          videoRef.current.pause();
-        } else {
-          videoRef.current.play();
-        }
-        setIsPlaying(!isPlaying);
-
-        canvas.removeEventListener('click', listenerClick);
-        await actualizarBoleto({ _id: boletoDetalles._id }); */
         imagen = new Image();
         imagen.src = urlImagen;
         imagen.onload = async () => {
@@ -172,7 +163,7 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
     }
 
     return () => {
-      canvas.removeEventListener('click', listenerClick);
+      // canvas.removeEventListener('click', listenerClick);
     };
 
   }, [boletoDetalles]);
