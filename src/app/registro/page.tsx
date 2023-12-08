@@ -21,17 +21,34 @@ const downloadQRCode = () => {
 const App: React.FC = () => {
 
   const [codigos, setCodigos] = React.useState<any>([]);
+  const audioRefGana = React.useRef<any>(null);
+  const [isPlaying, setIsPlaying] = React.useState(false);
 
   return (
     <Row>
       <Col xs={24} sm={3} md={6} lg={4}>
+
+        <video ref={audioRefGana} style={{ width: "100%" }}>
+          <source src="../premio5000-u0qqqvsd-jqbuimxn_hX874pD5.mp4" type="video/mp4" />
+          <source src="../premio5000-u0qqqvsd-jqbuimxn_hX874pD5.webm" type="video/webm" />
+          <source src="../premio5000-u0qqqvsd-jqbuimxn_hX874pD5.ogg" type="video/ogg" />
+        </video>
+
+
+
         <div id="myqrcode">
           <QRCode size={200}
             errorLevel="H"
             value="https://ant.design/"
             bgColor="#fff"
             style={{ marginBottom: 16 }} />
-          <Button type="primary" onClick={downloadQRCode}>
+          <Button type="primary" onClick={() => {
+            if (isPlaying) {
+              audioRefGana.current.pause();
+            } else {
+              audioRefGana.current.play();
+            }
+          }}>
             Download
           </Button>
         </div>
