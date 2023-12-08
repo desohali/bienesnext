@@ -216,7 +216,7 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
     setloading(true);
     const formData = new FormData();
     formData.append("_idRifa", rifa._id);
-    const response = await fetch(`https://yocreoquesipuedohacerlo.com/descargarBoletos`, {
+    const response = await fetch(`http://localhost:4000/descargarBoletos`, {
       method: "post",
       body: formData
     });

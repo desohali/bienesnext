@@ -34,8 +34,8 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
   React.useEffect(() => {
     canvas = document.querySelector("canvas");
   }, []);
-
-  const [urlVideo, setUrlVideo] = React.useState("");
+  const [urlAudio, setUrlAudio] = React.useState("");
+  const [urlImagen, setUrlImagen] = React.useState("");
   React.useEffect(() => {
 
     if (boletoDetalles) {
@@ -43,18 +43,19 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
         const videoName = boletoDetalles.premio
           ? `premio${boletoDetalles.premio.toString()}`
           : 'sigueIntentando';
-        setUrlVideo(`../../../videos/${videoName}.mp4`);
-        const videoElement: any = videoRef.current;
 
-        const handleCanPlayThrough = () => {
-          // Cuando el video está completamente cargado, establecer el estado como cargado
-          setVideoLoaded(true);
-        };
+        const img = new Image();
+        img.src = `../../../imagenes/${videoName}.PNG`;
+        setUrlImagen(`../../../imagenes/${videoName}.PNG`);
 
-        videoElement.addEventListener('canplaythrough', handleCanPlayThrough);
+        if (boletoDetalles.premio >= 600000) {
+          setUrlAudio(`../../../imagenes/premioMayor.mp3`);
+        } else if (boletoDetalles.premio < 600000 && boletoDetalles.premio > 0) {
+          setUrlAudio(`../../../imagenes/premioMenor.mp3`);
+        } else {
+          setUrlAudio(`../../../imagenes/sigueIntentando.mp3`);
+        }
 
-        // Comenzar la carga del video
-        videoElement.load();
       }
     }
   }, [boletoDetalles]);
@@ -87,8 +88,8 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
         y >= rectY &&
         y <= rectY + rectHeight
       ) {
-        setShowVideoResponse(true);
-        if (isPlaying) {
+
+        /* if (isPlaying) {
           videoRef.current.pause();
         } else {
           videoRef.current.play();
@@ -96,7 +97,24 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
         setIsPlaying(!isPlaying);
 
         canvas.removeEventListener('click', listenerClick);
-        await actualizarBoleto({ _id: boletoDetalles._id });
+        await actualizarBoleto({ _id: boletoDetalles._id }); */
+        imagen = new Image();
+        imagen.src = urlImagen;
+        imagen.onload = async () => {
+          // Dibuja la imagen en el canvas
+          canvas.width = imagen.width;
+          canvas.height = imagen.height;
+          ctx.drawImage(imagen, 0, 0);
+          if (isPlaying) {
+            videoRef.current.pause();
+          } else {
+            videoRef.current.play();
+          }
+          setIsPlaying(!isPlaying);
+
+          canvas.removeEventListener('click', listenerClick);
+          await actualizarBoleto({ _id: boletoDetalles._id });
+        }
 
       }
     };
@@ -168,12 +186,9 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
         </Col>
         <Col className="gutter-row" xs={24} sm={16} md={12} lg={8}>
 
-          <canvas style={{ display: showVideoResponse ? "none" : "" }} ref={refCanvas2d} width={628} height={1280} ></canvas>
+          <canvas ref={refCanvas2d} width={628} height={1280} ></canvas>
 
-          <video style={{ display: !showVideoResponse ? "none" : "" }} ref={videoRef} width="100%">
-            <source src={urlVideo} type="video/mp4" />
-            Tu navegador no admite la reproducción de videos.
-          </video>
+          <audio ref={videoRef} src={urlAudio} />
 
         </Col>
         <Col className="gutter-row" xs={24} sm={4} md={6} lg={8}>
