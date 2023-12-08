@@ -94,9 +94,11 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
 
         canvas.removeEventListener('click', listenerClick);
         await actualizarBoleto({ _id: boletoDetalles._id }); */
+        console.log('urlImagen', urlImagen)
         imagen = new Image();
         imagen.src = urlImagen;
         imagen.onload = async () => {
+          console.log('load', true)
           // Dibuja la imagen en el canvas
           canvas.width = imagen.width;
           canvas.height = imagen.height;
