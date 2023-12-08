@@ -84,7 +84,7 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
         y >= rectY &&
         y <= rectY + rectHeight
       ) {
-
+        console.log('click', true)
         /* if (isPlaying) {
           videoRef.current.pause();
         } else {
@@ -108,8 +108,8 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
           }
           setIsPlaying(!isPlaying);
           
-          canvas.removeEventListener('click', listenerClick);
-          //await actualizarBoleto({ _id: boletoDetalles._id });
+          // canvas.removeEventListener('click', listenerClick);
+          // await actualizarBoleto({ _id: boletoDetalles._id });
         }
 
       }
