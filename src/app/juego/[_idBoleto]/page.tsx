@@ -5,7 +5,6 @@ import { Col, Row } from 'antd';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-
 var canvas: any, ctx: any, imagen: any;
 var width = 642, height = 1280;
 
@@ -31,21 +30,19 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
     canvas = document.querySelector("canvas");
   }, []);
   const [urlAudio, setUrlAudio] = React.useState("");
-  const [urlImagen, setUrlImagen] = React.useState("");
-  console.log('urlImagen', urlImagen)
+
   React.useEffect(() => {
 
     if (boletoDetalles) {
-      console.log('1', 1)
+
       if (boletoDetalles.estadoMenor) {
-        console.log('2', 2)
+
         const videoName = boletoDetalles.premio
           ? `premio${boletoDetalles.premio.toString()}`
           : 'sigueIntentando';
 
         const img = new Image();
         img.src = `../../../imagenes/${videoName}.PNG`;
-        setUrlImagen(`../../../imagenes/${videoName}.PNG`);
 
         if (boletoDetalles.premio >= 600000) {
           setUrlAudio(`../../../imagenes/premioMayor.mp3`);
@@ -60,7 +57,6 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
   }, [boletoDetalles]);
 
 
-  const [showVideoResponse, setShowVideoResponse] = React.useState<boolean>(false);
   const [isPlaying, setIsPlaying] = React.useState(false);
   React.useEffect(() => {
 
@@ -87,19 +83,12 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
         y >= rectY &&
         y <= rectY + rectHeight
       ) {
-        console.log('click', true)
-        /* if (isPlaying) {
-          videoRef.current.pause();
-        } else {
-          videoRef.current.play();
-        }
-        setIsPlaying(!isPlaying);
+        const videoName = boletoDetalles.premio
+          ? `premio${boletoDetalles.premio.toString()}`
+          : 'sigueIntentando';
 
-        canvas.removeEventListener('click', listenerClick);
-        await actualizarBoleto({ _id: boletoDetalles._id }); */
-        console.log('urlImagen', urlImagen)
         imagen = new Image();
-        imagen.src = urlImagen;
+        imagen.src = `../../../imagenes/${videoName}.PNG`;
         imagen.onload = async () => {
           console.log('load', true)
           // Dibuja la imagen en el canvas
@@ -112,9 +101,9 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
             videoRef.current.play();
           }
           setIsPlaying(!isPlaying);
-          
-          // canvas.removeEventListener('click', listenerClick);
-          // await actualizarBoleto({ _id: boletoDetalles._id });
+
+          canvas.removeEventListener('click', listenerClick);
+          await actualizarBoleto({ _id: boletoDetalles._id });
         }
 
       }
@@ -187,7 +176,7 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
         </Col>
         <Col className="gutter-row" xs={24} sm={16} md={12} lg={8}>
 
-          <canvas  width={628} height={1280} ></canvas>
+          <canvas width={628} height={1280} ></canvas>
 
           <audio ref={videoRef} src={urlAudio} />
 
