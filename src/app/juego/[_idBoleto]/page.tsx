@@ -32,8 +32,8 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
 
 
   React.useEffect(() => {
-    canvas = document.querySelector("canvas");
-  }, []);
+    canvas = refCanvas2d.current;
+  }, [refCanvas2d]);
   const [urlAudio, setUrlAudio] = React.useState("");
   const [urlImagen, setUrlImagen] = React.useState("");
   React.useEffect(() => {
@@ -111,16 +111,16 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
             videoRef.current.play();
           }
           setIsPlaying(!isPlaying);
-
+          console.log('click', true)
           canvas.removeEventListener('click', listenerClick);
-          await actualizarBoleto({ _id: boletoDetalles._id });
+          //await actualizarBoleto({ _id: boletoDetalles._id });
         }
 
       }
     };
 
     if (boletoDetalles) {
-
+      console.log('boletoDetalles', boletoDetalles)
       if (boletoDetalles.estadoMenor) {
         canvas.addEventListener("click", listenerClick);
       }
