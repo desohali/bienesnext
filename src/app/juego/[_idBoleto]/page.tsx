@@ -32,10 +32,13 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
   }, []);
   const [urlAudio, setUrlAudio] = React.useState("");
   const [urlImagen, setUrlImagen] = React.useState("");
+  console.log('urlImagen', urlImagen)
   React.useEffect(() => {
 
     if (boletoDetalles) {
+      console.log('1', 1)
       if (boletoDetalles.estadoMenor) {
+        console.log('2', 2)
         const videoName = boletoDetalles.premio
           ? `premio${boletoDetalles.premio.toString()}`
           : 'sigueIntentando';
