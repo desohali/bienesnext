@@ -110,7 +110,7 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
     };
 
     if (boletoDetalles) {
-      console.log('boletoDetalles', boletoDetalles)
+
       if (boletoDetalles.estadoMenor) {
         canvas.addEventListener("click", listenerClick);
       }
@@ -146,7 +146,8 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
             ctx.fillRect(0, 625, 628, 300);
             ctx.fillStyle = "black";
 
-            ctx.fillText(`Premio de ${boletoDetalles?.premio} pendiente de pago!`, 25, 775);
+            ctx.fillText(`Premio de ${boletoDetalles?.premio} pendiente`, 25, 775);
+            ctx.fillText(`de pago!`, 25, 825);
           } else {
             ctx.fillStyle = "black";
             ctx.fillRect(0, 625, 628, 300);
