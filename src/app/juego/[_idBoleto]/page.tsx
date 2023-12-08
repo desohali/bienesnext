@@ -27,13 +27,9 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
   }, []);
 
   const videoRef = React.useRef<any>(null);
-  const refCanvas2d = React.useRef<any>();
-  const [videoLoaded, setVideoLoaded] = React.useState(false);
-
-
   React.useEffect(() => {
-    canvas = refCanvas2d.current;
-  }, [refCanvas2d]);
+    canvas = document.querySelector("canvas");
+  }, []);
   const [urlAudio, setUrlAudio] = React.useState("");
   const [urlImagen, setUrlImagen] = React.useState("");
   React.useEffect(() => {
@@ -89,6 +85,15 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
         y <= rectY + rectHeight
       ) {
 
+        /* if (isPlaying) {
+          videoRef.current.pause();
+        } else {
+          videoRef.current.play();
+        }
+        setIsPlaying(!isPlaying);
+
+        canvas.removeEventListener('click', listenerClick);
+        await actualizarBoleto({ _id: boletoDetalles._id }); */
         imagen = new Image();
         imagen.src = urlImagen;
         imagen.onload = async () => {
@@ -102,7 +107,7 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
             videoRef.current.play();
           }
           setIsPlaying(!isPlaying);
-          console.log('click', true)
+          
           canvas.removeEventListener('click', listenerClick);
           //await actualizarBoleto({ _id: boletoDetalles._id });
         }
@@ -163,7 +168,7 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
     }
 
     return () => {
-      // canvas.removeEventListener('click', listenerClick);
+      canvas.removeEventListener('click', listenerClick);
     };
 
   }, [boletoDetalles]);
@@ -177,7 +182,7 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
         </Col>
         <Col className="gutter-row" xs={24} sm={16} md={12} lg={8}>
 
-          <canvas ref={refCanvas2d} width={628} height={1280} ></canvas>
+          <canvas  width={628} height={1280} ></canvas>
 
           <audio ref={videoRef} src={urlAudio} />
 
