@@ -13,32 +13,27 @@ const Scanner = () => {
       .then((videoInputDevices) => {
         const rearCamera = videoInputDevices.find(device => device.label.includes('back'));
         if (rearCamera) {
-          if (videoInputDevices && videoInputDevices.length > 0) {
-            // Iniciar el escaneo continuo
-            const startScanning = () => {
-              codeReader.current.decodeFromInputVideoDevice(rearCamera.deviceId, videoRef.current)
-                .then((result: any) => {
-                  console.log('Código leído:', result.text);
-                  // Hacer algo con el código leído
-                  settext(result.text)
+          const startScanning = () => {
+            codeReader.current.decodeFromInputVideoDevice(rearCamera.deviceId, videoRef.current)
+              .then((result: any) => {
+                console.log('Código leído:', result.text);
+                // Hacer algo con el código leído
+                if (result.text !== text) {
+                  settext(result.text);
+                }
 
-                  startScanning(); // Reiniciar el escaneo para leer el siguiente código
+                // startScanning(); // Reiniciar el escaneo para leer el siguiente código
 
-                })
-                .catch((err) => {
-                  console.error('Error de lectura:', err);
-                  if (scanning) {
-                    startScanning(); // Intentar leer el siguiente código en caso de error
-                  }
-                });
-            };
-
-            startScanning(); // Comenzar el escaneo continuo
-          } else {
-            console.error('No se encontraron cámaras disponibles.');
-          }
+              })
+              .catch((err) => {
+                console.error('Error de lectura:', err);
+                if (scanning) {
+                  startScanning(); // Intentar leer el siguiente código en caso de error
+                }
+              });
+          };
+          startScanning(); // Comenzar el escaneo inicial
         }
-
       })
       .catch((err) => {
         console.error('Error al listar cámaras:', err);
