@@ -1,10 +1,10 @@
 "use client";
 import React, { useRef, useEffect } from 'react';
-import { BrowserMultiFormatReader } from '@zxing/library';
+import { BrowserCodeReader, MultiFormatReader } from '@zxing/library';
 
 const Scanner = () => {
   const videoRef = useRef<any>(null);
-  const codeReader = useRef(new BrowserMultiFormatReader());
+  const codeReader = useRef(new BrowserCodeReader(new MultiFormatReader()));
   const [text, settext] = React.useState<string>("second");
   useEffect(() => {
     let scanning = true;
@@ -46,10 +46,7 @@ const Scanner = () => {
     };
   }, []);
 
-  return <>
-  <video ref={videoRef} />
-  <h4>{text}</h4>
-  </>;
+  return <video ref={videoRef} />;
 };
 
 export default Scanner;
