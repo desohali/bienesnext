@@ -1,31 +1,34 @@
-// Ejemplo de uso en Node.js
-/* const jsQR = require('jsqr');
-const qrImage = require('qr-image');
-const qrCodeReader = require('qrcode-reader'); */
-"use client"
-// Ejemplo de uso en React (componente funcional)
-/* const QrReader = require('react-qr-reader'); */import { QrReader } from 'react-qr-reader';
+"use client";
+import React from 'react';
+const QrReader = require('react-qr-scanner');
 
-const MyQRReaderComponent = () => {
-  const handleScan = (data:any) => {
-    if (data) {
-      // Hacer algo con el dato del código QR leído
-      console.log(data);
-    }
+
+const page = () => {
+  const previewStyle = {
+    height: 240,
+    width: 320,
+  };
+
+  const [result, setResult] = React.useState('No result');
+
+
+  function handleScan(data: any) {
+    setResult(data);
   }
-
-  const handleError = (error:any) => {
-    console.error(error);
+  function handleError(err: any) {
+    console.error(err)
   }
-
   return (
-    <QrReader
-      delay={300}
-      onError={handleError}
-      onScan={handleScan}
-      style={{ width: '100%' }}
-    />
-  );
+    <div>
+      <QrReader
+        delay={300}
+        style={previewStyle}
+        onError={handleError}
+        onScan={handleScan}
+      />
+      <p>{result}</p>
+    </div>
+  )
 }
 
-export default MyQRReaderComponent;
+export default page
