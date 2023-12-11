@@ -20,9 +20,10 @@ const Scanner = () => {
                 // Hacer algo con el código leído
                 if (result.text !== text) {
                   settext(result.text);
+                  startScanning();
                 }
 
-                // startScanning(); // Reiniciar el escaneo para leer el siguiente código
+                //  // Reiniciar el escaneo para leer el siguiente código
 
               })
               .catch((err) => {
@@ -47,7 +48,7 @@ const Scanner = () => {
 
   return <>
     <video ref={videoRef} />
-    <h4>{text}</h4>
+    <h4>{text.split("/").reverse()[0]}</h4>
   </>;
 };
 
