@@ -5,6 +5,8 @@ import {
   MenuUnfoldOutlined,
   HomeFilled,
   UserOutlined,
+  QrcodeOutlined,
+  GiftOutlined,
   SketchOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, theme, Spin, Breadcrumb, Drawer, Space, DrawerProps, Typography } from 'antd';
@@ -15,6 +17,11 @@ import { useRouter } from 'next/navigation';
 
 const { Title } = Typography;
 const { Header, Content } = Layout;
+enum OpcionesMenu {
+  Rifas = 'Rifas',
+  PremiosQR = 'PremiosQR',
+  ValidadorQR = 'ValidadorQR'
+}
 
 const App: React.FC = ({ children }: any) => {
 
@@ -28,8 +35,22 @@ const App: React.FC = ({ children }: any) => {
   }, []);
 
   const handleMenuClick = (e: any) => {
-    router.push('/admin');
-    dispatch(setMenuButtonKey(e.key));
+    // Verificar la opción seleccionada
+    switch (e.key as OpcionesMenu) {
+      case OpcionesMenu.Rifas:
+        router.push('./rifas');
+        break;
+      case OpcionesMenu.PremiosQR:
+        router.push('./premios');
+        break;
+      case OpcionesMenu.ValidadorQR:
+        router.push('./boletos-devueltos');
+        break;
+      default:
+        alert("Opción no reconocida!");
+        break;
+    }
+    dispatch(setMenuButtonKey(e.key as OpcionesMenu));
     setOpen(false);
   };
 
@@ -52,15 +73,20 @@ const App: React.FC = ({ children }: any) => {
   };
 
   const menu: any = [
-    /* {
-      key: 'Inicio',
-      icon: <HomeFilled />,
-      label: 'Inicio',
-    }, */
     {
-      key: 'Rifas',
+      key: OpcionesMenu.Rifas,
       icon: <SketchOutlined />,
       label: 'Rifas',
+    },
+    {
+      key: OpcionesMenu.PremiosQR,
+      icon: <GiftOutlined />,
+      label: 'Premios QR',
+    },
+    {
+      key: OpcionesMenu.ValidadorQR,
+      icon: <QrcodeOutlined />,
+      label: 'Validador QR',
     },
   ];
 
@@ -90,7 +116,7 @@ const App: React.FC = ({ children }: any) => {
       </Header>
       <Content style={{ padding: '0 12px' }}>
         <Drawer
-          title={`${size} Drawer`}
+          title="Opciones de rifas QR"
           placement="left"
           size={size}
           onClose={onClose}

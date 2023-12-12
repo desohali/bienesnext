@@ -237,7 +237,7 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
   return (
     <Card
       onClick={() => {
-        router.push(`./admin/${rifa._id}`);
+        router.push(`./${rifa._id}`);
       }}
       hoverable
       style={{ width: "100%" }}

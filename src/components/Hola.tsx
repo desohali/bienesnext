@@ -1,8 +1,11 @@
 import React from 'react'
 
-const Hola = () => {
+const Hola = (params:any) => {
+
+console.log('params', params)
+
   return (
-    <div>Hola</div>
+    <div>{params?.saludo}</div>
   )
 }
 
