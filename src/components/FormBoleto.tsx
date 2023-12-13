@@ -159,7 +159,7 @@ const FormBoleto: React.FC = () => {
 
       <List
         size="small"
-        header={<div>{`Lista de 2N° ganadores ${boletosConPremio.length}`}</div>}
+        header={<div>{`Lista de 2N° ganadores : ${boletosConPremio.length}`}</div>}
         bordered
         dataSource={boletosConPremio}
         renderItem={(item: any) => <List.Item>{`Boleto : ${item.premioMenor} Premio: ${item.premio.toFixed(2)}`}</List.Item>}
