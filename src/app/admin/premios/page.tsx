@@ -1,17 +1,21 @@
 "use client";
 import * as React from 'react';
-import { Alert, Button, Col, Flex, List, Row, Select, notification } from 'antd';
+import { Alert, Button, Col, Divider, Flex, List, Row, Select, notification } from 'antd';
 import { useBuscarBoletoMutation, useListarBoletosPagadosMutation, usePagarBoletoMutation } from '@/services/userApi';
-import { BrowserCodeReader, MultiFormatReader } from '@zxing/library';
+import { BrowserCodeReader, MultiFormatReader, BrowserQRCodeReader } from '@zxing/library';
 import {
-  DollarOutlined
+  DollarOutlined,
+  QrcodeOutlined
 } from '@ant-design/icons';
 
+var selectedDeviceId: any;
+var valueQR: string = "";
 
 const Premios = () => {
+
   const videoRef = React.useRef<any>(null);
-  const codeReader = React.useRef(new BrowserCodeReader(new MultiFormatReader()));
-  const [textQr, setTextQr] = React.useState<string>("");
+  const audioRef = React.useRef<any>(null);
+  const codeReader = React.useRef<any>(new BrowserQRCodeReader());
 
   const [buscarBoleto, { data, error, isLoading }] = useBuscarBoletoMutation();
   const [listarBoletosPagados, { data: dataList = [], error: errorList, isLoading: isLoadingList }] = useListarBoletosPagadosMutation();
@@ -35,55 +39,73 @@ const Premios = () => {
     })();
   }, []);
 
-  React.useEffect(() => {
-    let scanning = true;
-
-    codeReader.current.listVideoInputDevices()
-      .then((videoInputDevices) => {
-        const rearCamera = videoInputDevices.find(device => device.label.includes('back'));
-
-        if (rearCamera || (videoInputDevices && videoInputDevices.length)) {
-          const startScanning = () => {
-            codeReader.current.decodeFromInputVideoDevice((rearCamera?.deviceId || videoInputDevices[0].deviceId), videoRef.current)
-              .then(async (result: any) => {
-                if (result.text.toString() !== textQr.toString()) {
-                  const findBoleto = await buscarBoleto({ _id: result.text.split("/").reverse()[0] });
-                  setTextQr(result.text);
-                  startScanning();
-                }
-
-              })
-              .catch((err) => {
-                console.error('Error de lectura:', err);
-                if (scanning) {
-                  startScanning(); // Intentar leer el siguiente código en caso de error
-                }
-              });
-          };
-          startScanning(); // Comenzar el escaneo inicial
+  function decodeContinuously(codeReader: any, selectedDeviceId: any) {
+    codeReader.decodeFromInputVideoDeviceContinuously(selectedDeviceId, videoRef.current, async (result: any, err: any) => {
+      if (result) {
+        if (result.text.toString() != valueQR.toString()) {
+          audioRef.current.play();
+          valueQR = result.text.toString();
+          const findBoleto = await buscarBoleto({ _id: result.text.split("/").reverse()[0] });
         }
-      })
-      .catch((err) => {
-        console.error('Error al listar cámaras:', err);
-      });
+      }
+    });
+  };
 
+  React.useEffect(() => {
+    codeReader.current.getVideoInputDevices()
+      .then((videoInputDevices: any) => {
+        const rearCamera = videoInputDevices.find((device: any) => device.label.includes('back'));
+        selectedDeviceId = (rearCamera?.deviceId || videoInputDevices[0].deviceId);
+      });
     return () => {
-      scanning = false; // Detener el escaneo al desmontar el componente
       codeReader.current.reset();
-    };
+    }
   }, []);
 
   const [selectValue, setSelectValue] = React.useState(undefined);
-console.log('selectValue', selectValue)
+  const [isLargeScreen, setIsLargeScreen] = React.useState(false);
+
+  React.useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+
+    function handleScreenChange(e: any) {
+      setIsLargeScreen(e.matches);
+    }
+
+    mediaQuery.addListener(handleScreenChange); // Escuchar cambios en la pantalla
+    handleScreenChange(mediaQuery); // Ejecutar la función inicialmente
+
+    // Limpiar el listener al desmontar el componente
+    return () => {
+      mediaQuery.removeListener(handleScreenChange);
+    };
+  }, []);
+
   return (
     <React.Suspense>
       <Row gutter={16}>
 
         <Col className="gutter-row" xs={24} sm={24} md={12} lg={8}>
+
+          <Flex gap="small" style={{ width: '100%', marginBottom: ".5rem" }}>
+            <Button icon={<QrcodeOutlined />} onClick={() => {
+              decodeContinuously(codeReader.current, selectedDeviceId);
+            }} type="primary" block>
+              Iniciar cámara
+            </Button>
+            <Button icon={<QrcodeOutlined />} onClick={() => {
+              codeReader.current.reset();
+            }} type="primary" block danger>
+              Detener cámara
+            </Button>
+          </Flex>
+
+
           <video ref={videoRef} style={{ width: "100%", borderStyle: "dashed", borderRadius: ".5rem", marginBottom: ".5rem" }} />
           {(data && data.estadoMenor) && (
             <>
               <Alert
+                closable
                 style={{ marginBottom: ".5rem" }}
                 message={`Boleto : ${data?.premioMenor}`}
                 description="Aun no ha sido jugado!"
@@ -96,6 +118,7 @@ console.log('selectValue', selectValue)
           {(data && !data.estadoMenor && data.estadoPago) && (
             <>
               <Alert
+                closable
                 style={{ marginBottom: ".5rem" }}
                 message={`Boleto : ${data?.premioMenor}`}
                 description="Ya ha sido pagado!"
@@ -108,6 +131,7 @@ console.log('selectValue', selectValue)
           {(data && !data.estadoMenor && !data.estadoPago) && (
             <>
               <Alert
+                closable
                 style={{ marginBottom: ".5rem" }}
                 message={`Boleto : ${data?.premioMenor}`}
                 description={Boolean(data?.premio) ? `Premio de ${data?.premio.toFixed(2)} pendiente de pago!` : "Este boleto no tuvo premio."}
@@ -129,56 +153,58 @@ console.log('selectValue', selectValue)
             </>
           )}
         </Col>
-        <Col className="gutter-row" xs={24} sm={24} md={12} lg={8}></Col>
+        <Col className="gutter-row" xs={24} sm={24} md={0} lg={8}>
+          <audio style={{ display: "none" }} ref={audioRef}>
+            <source src="../../../store-scanner-beep-90395.mp3" type="audio/mpeg" />
+          </audio>
+        </Col>
         <Col className="gutter-row" xs={24} sm={24} md={12} lg={8}>
           {contextHolder}
-
+          {isLargeScreen && <Divider>2N° ganadores</Divider>}
+          <Select
+            showSearch
+            allowClear
+            value={selectValue}
+            onChange={(data: any) => {
+              setSelectValue(data);
+            }}
+            style={{ width: "100%", marginBottom: ".5rem" }}
+            placeholder="Seleccione rifa"
+            optionFilterProp="children"
+            filterOption={(input: any, option: any) => (option?.label ?? '').includes(input)}
+            filterSort={(optionA: any, optionB: any) =>
+              (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+            }
+            options={[
+              {
+                value: '1',
+                label: 'Not Identified',
+              },
+              {
+                value: '2',
+                label: 'Closed',
+              },
+              {
+                value: '3',
+                label: 'Communicated',
+              },
+              {
+                value: '4',
+                label: 'Identified',
+              },
+              {
+                value: '5',
+                label: 'Resolved',
+              },
+              {
+                value: '6',
+                label: 'Cancelled',
+              },
+            ]}
+          />
           <List
             size="small"
-            header={<div>
-              {/* {`Lista de boletos pagados : ${dataList.length}`} */}
-              <Select
-                showSearch
-                allowClear
-                value={selectValue}
-                onChange={(data: any) => {
-                  setSelectValue(data);
-                }}
-                style={{ width: "100%" }}
-                placeholder="Search to Select"
-                optionFilterProp="children"
-                filterOption={(input: any, option: any) => (option?.label ?? '').includes(input)}
-                filterSort={(optionA: any, optionB: any) =>
-                  (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-                }
-                options={[
-                  {
-                    value: '1',
-                    label: 'Not Identified',
-                  },
-                  {
-                    value: '2',
-                    label: 'Closed',
-                  },
-                  {
-                    value: '3',
-                    label: 'Communicated',
-                  },
-                  {
-                    value: '4',
-                    label: 'Identified',
-                  },
-                  {
-                    value: '5',
-                    label: 'Resolved',
-                  },
-                  {
-                    value: '6',
-                    label: 'Cancelled',
-                  },
-                ]}
-              />
-            </div>}
+            header={<div>{`Lista de boletos pagados : ${dataList.length}`}</div>}
             bordered
             dataSource={dataList}
             renderItem={(item: any) => (
