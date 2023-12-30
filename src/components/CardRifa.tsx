@@ -10,7 +10,7 @@ const { PDFDocument, rgb } = require('pdf-lib');
 const QRCode = require('qrcode');
 
 var pdfDoc: any;
-var canvas: any, imagen: any, ctx: any;
+var imagen: any;
 ////////////////////////////////////////////////////////////////////
 const imagenLoaded = (imageBase64: string) => {
   return new Promise((resolve) => {
@@ -20,7 +20,7 @@ const imagenLoaded = (imageBase64: string) => {
     img.src = imageBase64
   });
 };
-const crearBoleto = async (element: any, ctx: any, /* imagee: any, */ findRifa: any) => {
+const crearBoleto = async (element: any, canvas: any, ctx: any, findRifa: any) => {
   const imageBase64 = await QRCode.toDataURL(`https://bienesnext.vercel.app/juego/${element._id}`, {
     width: 80,
     errorCorrectionLevel: 'L',
@@ -61,7 +61,11 @@ const crearBoleto = async (element: any, ctx: any, /* imagee: any, */ findRifa: 
 
 const { Meta } = Card;
 
+
 const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: any) => {
+
+  var canvas: any, ctx: any;
+
   const descargarBoletos = async (boletos: any[]) => {
 
     pdfDoc = await PDFDocument.create();
@@ -75,8 +79,10 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
 
     const boletosImages: any = [];
     for (const boleto of boletos) {
+
       const imagePng = await crearBoleto(
         boleto,
+        canvas,
         ctx,
         rifa
       );
@@ -155,19 +161,7 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
     window.URL.revokeObjectURL(pdfUrl);
     // Abrir una nueva pestaña con el PDF
     // window.open(pdfUrl);
-  }
-
-  React.useEffect(() => {
-    canvas = document.getElementById(rifa._id);
-    ctx = canvas.getContext("2d");
-    // Carga la imagen
-    imagen = new Image();
-    imagen.onload = function () {
-      // Dibuja la imagen en el canvas
-      ctx.drawImage(imagen, 0, 0);
-    };
-    imagen.src = '../../ticket_mini_transparente.png';
-  }, [rifa._id]);
+  };
 
 
   const router = useRouter();
@@ -185,7 +179,7 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
     ctx = canvas.getContext('2d');
 
     // Carga la imagen
-    let imagen = new Image();
+    imagen = new Image();
     imagen.onload = function () {
       // Dibuja todo el canvas de color de la rifa
       ctx.fillStyle = rifa.color;
@@ -212,27 +206,6 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
 
 
   const [loading, setloading] = React.useState(false);
-  /* const descargarBoletos = async (rifa: any) => {
-    setloading(true);
-    const formData = new FormData();
-    formData.append("_idRifa", rifa._id);
-    const response = await fetch(`https://yocreoquesipuedohacerlo.com/descargarBoletos`, {
-      method: "post",
-      body: formData
-    });
-    const blob = await response.blob();
-    // Crea un enlace temporal para descargar el archivo
-    const url = window.URL.createObjectURL(new Blob([blob]));
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Rifa-${rifa.fecha}.pdf`; // Nombre del archivo que se descargará
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-
-    setloading(false);
-  } */
 
   return (
     <Card

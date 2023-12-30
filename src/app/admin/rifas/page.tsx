@@ -9,7 +9,7 @@ import CardRifa from '@/components/CardRifa';
 import { useListarRifasQuery } from '@/services/userApi';
 import FormBoleto from '@/components/FormBoleto';
 
-const App: React.FC = () => {
+const Rifas: React.FC = () => {
 
   const dispatch = useDispatch();
   const { listaDeRifas, isRifa } = useSelector((state: any) => state.admin);
@@ -18,15 +18,11 @@ const App: React.FC = () => {
   const { data, error, isLoading, refetch } = useListarRifasQuery({});
 
   React.useEffect(() => {
-    if (data) {
-      dispatch(setListaDeRifas(data));
-    }
+    if (data) dispatch(setListaDeRifas(data));
   }, [data]);
 
   React.useEffect(() => {
-    if (isRifa) {
-      refetch();
-    }
+    if (isRifa) refetch();
   }, [isRifa]);
 
 
@@ -58,9 +54,8 @@ const App: React.FC = () => {
           </Col>
         ))}
       </Row>
-
     </React.Suspense >
   )
 }
 
-export default App;
+export default Rifas;

@@ -5,6 +5,7 @@ import {
   MenuUnfoldOutlined,
   HomeFilled,
   UserOutlined,
+  UsergroupAddOutlined,
   QrcodeOutlined,
   GiftOutlined,
   SketchOutlined,
@@ -19,6 +20,7 @@ const { Title } = Typography;
 const { Header, Content } = Layout;
 enum OpcionesMenu {
   Rifas = 'Rifas',
+  Usuarios = 'Usuarios',
   PremiosQR = 'PremiosQR',
   ValidadorQR = 'ValidadorQR'
 }
@@ -39,6 +41,9 @@ const App: React.FC = ({ children }: any) => {
     switch (e.key as OpcionesMenu) {
       case OpcionesMenu.Rifas:
         router.push('./rifas');
+        break;
+      case OpcionesMenu.Usuarios:
+        router.push('./usuarios');
         break;
       case OpcionesMenu.PremiosQR:
         router.push('./premios');
@@ -77,6 +82,11 @@ const App: React.FC = ({ children }: any) => {
       key: OpcionesMenu.Rifas,
       icon: <SketchOutlined />,
       label: 'Rifas',
+    },
+    {
+      key: OpcionesMenu.Usuarios,
+      icon: <UsergroupAddOutlined />,
+      label: 'Usuarios',
     },
     {
       key: OpcionesMenu.PremiosQR,

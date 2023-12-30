@@ -31,6 +31,17 @@ export const userApi = createApi({
       },
       //transformResponse: (response: any, meta, arg) => response.data,
     }),
+    listarUsuarios: builder.query({
+      query: (variables) => {
+        return {
+          url: 'listarUsuarios',
+          method: 'get',
+          // body: variables,// get no lleva body
+          headers: { uid: "token" },
+        }
+      },
+      //transformResponse: (response: any, meta, arg) => response.data,
+    }),
     listarBoletos: builder.mutation({
       query: (variables) => {
         return {
@@ -120,6 +131,17 @@ export const userApi = createApi({
       },
       //transformResponse: (response: any, meta, arg) => response.data,
     }),
+    registrarUsuario: builder.mutation({
+      query: (variables) => {
+        return {
+          url: 'registrarUsuario',
+          method: 'post',
+          body: variables,
+          headers: { uid: "token" },
+        }
+      },
+      //transformResponse: (response: any, meta, arg) => response.data,
+    }),
   }),
 });
 
@@ -128,6 +150,7 @@ export const userApi = createApi({
 export const {
   useRegistrarRifaMutation,
   useListarRifasQuery,
+  useListarUsuariosQuery,
   useListarBoletosMutation,
   useBuscarRifaMutation,
   useListarSegundosGanadoresMutation,
@@ -135,5 +158,6 @@ export const {
   useRegistrarPremioBoletosMutation,
   useActualizarBoletoMutation,
   useListarBoletosPagadosMutation,
-  usePagarBoletoMutation
+  usePagarBoletoMutation,
+  useRegistrarUsuarioMutation
 } = userApi;

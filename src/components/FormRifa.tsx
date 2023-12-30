@@ -1,17 +1,11 @@
 "use client";
-import React, { useState } from 'react';
-import { PlusOutlined } from '@ant-design/icons';
-import { Button, Col, ColorPicker, DatePicker, Drawer, Flex, Form, Input, InputNumber, Row, Select, Space, Tag } from 'antd';
-import { useDispatch, useSelector } from 'react-redux';
-import { setIsRifa, setOpenFormRifa } from '@/features/adminSlice';
-import { useRegistrarRifaMutation } from '@/services/userApi';
+import React from 'react';
 import swal from 'sweetalert';
+import { useDispatch, useSelector } from 'react-redux';
+import { useRegistrarRifaMutation } from '@/services/userApi';
+import { setIsRifa, setOpenFormRifa } from '@/features/adminSlice';
+import { Button, Col, Drawer, Flex, Form, Input, InputNumber, Row, Tag } from 'antd';
 
-const { Option } = Select;
-const layout = {
-  /*  labelCol: { span: 8 },
-   wrapperCol: { span: 16 }, */
-};
 const customizeRequiredMark = (label: React.ReactNode, { required }: { required: boolean }) => (
   <>
     {required ? <Tag color="error">Required</Tag> : <Tag color="warning">optional</Tag>}
@@ -26,7 +20,6 @@ const FormRifa: React.FC<{ formRifa: any }> = ({ formRifa }) => {
   const { openFormRifa } = useSelector((state: any) => state.admin);
 
   const existeIdRifa = Boolean(formRifa.getFieldValue("_id"));
-
 
   const style: React.CSSProperties = { width: '100%' };
   const [registrarRifa, { data, error, isLoading }] = useRegistrarRifaMutation();
@@ -46,7 +39,6 @@ const FormRifa: React.FC<{ formRifa: any }> = ({ formRifa }) => {
         }}>
         <Form
           form={formRifa}
-          {...layout}
           name="login-form"
           layout="vertical"
           style={{ width: "100%" }}
