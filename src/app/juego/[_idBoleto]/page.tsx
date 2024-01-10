@@ -84,6 +84,23 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
         y >= rectY &&
         y <= rectY + rectHeight
       ) {
+
+        // Obtener el valor de un parámetro específico
+        const params = new URLSearchParams(document.location.search);
+        const [_idUsuario, latitude, longitude] = [
+          (params.get('user') || ''),
+          (params.get('latitude') || ''),
+          (params.get('longitude') || '')
+        ];
+        if (!_idUsuario) {
+          swal("", "Usuario no autorizado!", "info");
+          return;
+        }
+        if (!latitude || !longitude) {
+          swal("", "Datos de ubicación incompletos!", "info");
+          return;
+        }
+
         const videoName = boletoDetalles.premio
           ? `premio${boletoDetalles.premio.toString()}`
           : 'sigueIntentando';
@@ -103,22 +120,6 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
           setIsPlaying(!isPlaying);
 
           canvas.removeEventListener('click', listenerClick);
-
-          // Obtener el valor de un parámetro específico
-          const params = new URLSearchParams(document.location.search);
-          const [_idUsuario, latitude, longitude] = [
-            (params.get('user') || ''),
-            (params.get('latitude') || ''),
-            (params.get('longitude') || '')
-          ];
-          if (!_idUsuario) {
-            swal("", "Usuario no autorizado!", "info");
-            return;
-          }
-          if (!latitude || !longitude) {
-            swal("", "Datos de ubicación incompletos!", "info");
-            return;
-          }
           await actualizarBoleto({
             _id: boletoDetalles._id,
             _idUsuario,
