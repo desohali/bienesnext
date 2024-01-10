@@ -4,6 +4,7 @@ import { useActualizarBoletoMutation, useBuscarBoletoMutation } from '@/services
 import { Col, Row } from 'antd';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import swal from 'sweetalert';
 
 var canvas: any, ctx: any, imagen: any;
 var width = 642, height = 1280;
@@ -90,7 +91,6 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
         imagen = new Image();
         imagen.src = `../../../imagenes/${videoName}.PNG`;
         imagen.onload = async () => {
-          console.log('load', true)
           // Dibuja la imagen en el canvas
           canvas.width = imagen.width;
           canvas.height = imagen.height;
@@ -103,7 +103,28 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
           setIsPlaying(!isPlaying);
 
           canvas.removeEventListener('click', listenerClick);
-          await actualizarBoleto({ _id: boletoDetalles._id });
+
+          // Obtener el valor de un parámetro específico
+          const params = new URLSearchParams(document.location.search);
+          const [_idUsuario, latitude, longitude] = [
+            (params.get('user') || ''),
+            (params.get('latitude') || ''),
+            (params.get('longitude') || '')
+          ];
+          if (!_idUsuario) {
+            swal("", "Usuario no autorizado!", "info");
+            return;
+          }
+          if (!latitude || !longitude) {
+            swal("", "Datos de ubicación incompletos!", "info");
+            return;
+          }
+          await actualizarBoleto({
+            _id: boletoDetalles._id,
+            _idUsuario,
+            latitude,
+            longitude,
+          });
         }
 
       }
