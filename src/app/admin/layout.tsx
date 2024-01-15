@@ -5,6 +5,7 @@ import {
   MenuUnfoldOutlined,
   HomeFilled,
   UserOutlined,
+  LogoutOutlined,
   UsergroupAddOutlined,
   QrcodeOutlined,
   GiftOutlined,
@@ -15,6 +16,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setMenuButtonKey } from '@/features/adminSlice';
 import { Footer } from 'antd/es/layout/layout';
 import { useRouter } from 'next/navigation';
+import { setUser } from '@/features/userSlice';
 
 const { Title } = Typography;
 const { Header, Content } = Layout;
@@ -22,7 +24,8 @@ enum OpcionesMenu {
   Rifas = 'Rifas',
   Usuarios = 'Usuarios',
   PremiosQR = 'PremiosQR',
-  ValidadorQR = 'ValidadorQR'
+  ValidadorQR = 'ValidadorQR',
+  cerrarSesion = 'cerrarSesion'
 }
 const url = "https://bienesnext.vercel.app/admin";
 
@@ -53,7 +56,9 @@ const App: React.FC = ({ children }: any) => {
         router.push(url + '/boletos-devueltos');
         break;
       default:
-        alert("Opción no reconocida!");
+        window.localStorage.removeItem("usuario");
+        dispatch(setUser(null));
+        router.push('https://bienesnext.vercel.app/login');
         break;
     }
     dispatch(setMenuButtonKey(e.key as OpcionesMenu));
@@ -98,6 +103,11 @@ const App: React.FC = ({ children }: any) => {
       key: OpcionesMenu.ValidadorQR,
       icon: <QrcodeOutlined />,
       label: 'Validador QR',
+    },
+    {
+      key: OpcionesMenu.cerrarSesion,
+      icon: <LogoutOutlined />,
+      label: 'Cerrar Sesión',
     },
   ];
 
