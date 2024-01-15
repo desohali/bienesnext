@@ -1,18 +1,17 @@
 "use client";
 import React from 'react';
-import { Avatar, Button, Col, Flex, Form, List, Row, Tooltip, Typography } from 'antd';
-import FormRifa from '@/components/FormRifa';
+import { Avatar, Button, Card, Col, Flex, Form, Row, Tooltip } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { PlusOutlined, UserOutlined, EditOutlined } from '@ant-design/icons';
+import { PlusOutlined, UserOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
 import { setOpenFormUsuario, setListaDeUsuarios } from '@/features/userSlice';
-import CardRifa from '@/components/CardRifa';
 import { useListarUsuariosQuery } from '@/services/userApi';
-import FormBoleto from '@/components/FormBoleto';
 import FormUsuario from '@/components/FormUsuario';
-const { Text } = Typography;
+import { useRouter } from 'next/navigation';
+const { Meta } = Card;
 
 const Usuarios: React.FC = () => {
 
+  const router = useRouter();
   const dispatch = useDispatch();
   const { listaDeUsuarios, isUsuario } = useSelector((state: any) => state.user);
   const [formUsuario] = Form.useForm();
@@ -53,30 +52,32 @@ const Usuarios: React.FC = () => {
       <Row gutter={[12, 12]}>
         {listaDeUsuarios.map((usuario: any) => (
           <Col key={usuario._id} className="gutter-row" xs={24} sm={12} md={8} lg={6}>
-            <List
-              itemLayout="horizontal"
-              dataSource={[usuario]}
-              renderItem={(item: any) => (
-                <List.Item actions={[<Tooltip title="Editar">
-                  <Button onClick={() => {
+            <Card
+              hoverable
+              style={{ width: "100%" }}
+              actions={[
+                <Tooltip title="Editar">
+                  <Button type="primary" onClick={(e) => {
+                    e.stopPropagation();
                     dispatch(setOpenFormUsuario(true));
                     formUsuario.resetFields();
                     formUsuario.setFieldsValue({ ...usuario, rifaAsignada: usuario?.rifaAsignada?._id || "" });
-                  }} type="primary" shape="circle" icon={<EditOutlined />} />
-                </Tooltip>]} style={style}>
-                  <List.Item.Meta
-                    avatar={<Avatar icon={<UserOutlined />} />}
-                    title={item?.usuario}
-                    description={<>
-                      <Text>{["v"].includes(item?.tipoUsuario) ? "Vendedor" : "Administrador"}</Text>
-                      <br />
-                      <Text>Rifa : {item?.rifaAsignada?.nombre}</Text>
-                    </>
-                    }
-                  />
-                </List.Item>
-              )}
-            />
+                  }} shape="circle" icon={<EditOutlined />} />
+                </Tooltip>,
+                <Tooltip title="Detalles">
+                  <Button type="primary" onClick={(e) => {
+                    e.stopPropagation();
+                    router.push(`./boletos-vendidos/${usuario?._id}`);
+                  }} shape="circle" icon={<EyeOutlined />} />
+                </Tooltip>,
+              ]}
+            >
+              <Meta
+                avatar={<Avatar icon={<UserOutlined />} />}
+                title={usuario?.usuario}
+                description={usuario?.descripcion}
+              />
+            </Card>
 
           </Col>
         ))}

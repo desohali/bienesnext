@@ -142,6 +142,28 @@ export const userApi = createApi({
       },
       //transformResponse: (response: any, meta, arg) => response.data,
     }),
+    loginValidadorQR: builder.mutation({
+      query: (variables) => {
+        return {
+          url: 'loginValidadorQR',
+          method: 'post',
+          body: variables,
+          headers: { uid: "token" },
+        }
+      },
+      //transformResponse: (response: any, meta, arg) => response.data,
+    }),
+    listarBoletosVendidos: builder.mutation({
+      query: (variables) => {
+        return {
+          url: 'listarBoletosVendidos',
+          method: 'post',
+          body: variables,
+          headers: { uid: "token" },
+        }
+      },
+      //transformResponse: (response: any, meta, arg) => response.data,
+    }),
   }),
 });
 
@@ -159,5 +181,7 @@ export const {
   useActualizarBoletoMutation,
   useListarBoletosPagadosMutation,
   usePagarBoletoMutation,
-  useRegistrarUsuarioMutation
+  useRegistrarUsuarioMutation,
+  useLoginValidadorQRMutation,
+  useListarBoletosVendidosMutation
 } = userApi;

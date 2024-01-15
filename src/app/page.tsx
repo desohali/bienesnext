@@ -11,7 +11,7 @@ const App: React.FC = () => {
   const [loading, setloading] = React.useState<Boolean>(true);
   React.useEffect(() => {
     setloading(false);
-    router.push('/admin');
+    router.push('/login');
   }, []);
 
   if (loading) {

@@ -5,6 +5,7 @@ import { ArrowRightOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { setUser } from '@/features/userSlice';
+import { useLoginValidadorQRMutation } from '@/services/userApi';
 const { Text } = Typography;
 
 const layout = {
@@ -21,12 +22,22 @@ const customizeRequiredMark = (label: React.ReactNode, { required }: { required:
 
 const App: React.FC = () => {
 
+  const [autenticarUsuario, { data, error, isLoading }] = useLoginValidadorQRMutation();
+  React.useEffect(() => {
+    if (data) {
+      window.localStorage.setItem("usuario", JSON.stringify(data));
+      dispatch(setUser(data));
+    }
+  }, [data]);
+
   const router = useRouter();
   const usuario = useSelector((state: any) => state.user.user);
-
   const dispatch = useDispatch();
   React.useEffect(() => {
-    dispatch(setUser(JSON.parse(window.localStorage.getItem("usuario") || "{}")));
+    const localStorageUser = window.localStorage.getItem("usuario");
+    if (localStorageUser) {
+      dispatch(setUser(JSON.parse(localStorageUser)));
+    }
   }, []);
 
   const [loading, setLoading] = React.useState(true);
@@ -52,18 +63,20 @@ const App: React.FC = () => {
     <Row justify="center" align="middle" style={{ height: "100vh", width: "100vw" }}>
       <Col xs={20} sm={18} md={14} lg={12}>
         <Card hoverable style={{ width: "100%" }} title={<Text strong>Autenticación</Text>} >
-          <Form {...layout} name="login-form" initialValues={{ remember: true }} onFinish={(values) => {
-            window.localStorage.setItem("usuario", JSON.stringify(values));
-            dispatch(setUser(values));
+          <Form {...layout} name="login-form" initialValues={{
+            usuario: '',
+            password: ''
+          }} onFinish={async (values) => {
+            await autenticarUsuario(values);
           }} requiredMark={customizeRequiredMark}>
             <Form.Item label={<Text>Usuario</Text>} name="usuario" rules={[{ required: true, message: 'Por favor ingrese usuario!' }]}>
               <Input />
             </Form.Item>
-            <Form.Item label={<Text>Contraseña</Text>} name="clave" rules={[{ required: true, message: 'Por favor ingrese contraseña!' }]}>
+            <Form.Item label={<Text>Contraseña</Text>} name="password" rules={[{ required: true, message: 'Por favor ingrese contraseña!' }]}>
               <Input type='password' />
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-              <Button icon={<ArrowRightOutlined />} type="primary" htmlType="submit">
+              <Button loading={isLoading} icon={<ArrowRightOutlined />} type="primary" htmlType="submit">
                 Ingresar
               </Button>
             </Form.Item>

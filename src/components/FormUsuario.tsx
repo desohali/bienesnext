@@ -56,7 +56,6 @@ const FormUsuario: React.FC<{ formUsuario: any }> = ({ formUsuario }) => {
             usuario: "",
             password: "",
             tipoUsuario: "v",
-            rifaAsignada: "",
             estado: "a",
             descripcion: ""
           }}
@@ -112,25 +111,6 @@ const FormUsuario: React.FC<{ formUsuario: any }> = ({ formUsuario }) => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="rifaAsignada"
-                label="Rifa asignada"
-                rules={[{
-                  required: ["v"].includes(tipoUsuario) ? true : false,
-                  message: 'Por favor, seleccione rifa asignada'
-                }]}
-              >
-                <Select>
-                  {listaDeRifas.map((rifa: any) => (
-                    <Select.Option value={rifa._id}>{rifa.nombre}</Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-
-            <Col span={12}>
-              <Form.Item
                 name="estado"
                 label="Estado"
                 rules={[{ required: true, message: 'Por favor, seleccione estado' }]}
@@ -141,7 +121,9 @@ const FormUsuario: React.FC<{ formUsuario: any }> = ({ formUsuario }) => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={12}>
+          </Row>
+          <Row gutter={16}>
+            <Col span={24}>
               <Form.Item
                 name="descripcion"
                 label="Descripción"

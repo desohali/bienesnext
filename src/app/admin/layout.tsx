@@ -24,6 +24,7 @@ enum OpcionesMenu {
   PremiosQR = 'PremiosQR',
   ValidadorQR = 'ValidadorQR'
 }
+const url = "https://bienesnext.vercel.app/admin";
 
 const App: React.FC = ({ children }: any) => {
 
@@ -40,16 +41,16 @@ const App: React.FC = ({ children }: any) => {
     // Verificar la opción seleccionada
     switch (e.key as OpcionesMenu) {
       case OpcionesMenu.Rifas:
-        router.push('./rifas');
+        router.push(url + '/rifas');
         break;
       case OpcionesMenu.Usuarios:
-        router.push('./usuarios');
+        router.push(url + '/usuarios');
         break;
       case OpcionesMenu.PremiosQR:
-        router.push('./premios');
+        router.push(url + '/premios');
         break;
       case OpcionesMenu.ValidadorQR:
-        router.push('./boletos-devueltos');
+        router.push(url + '/boletos-devueltos');
         break;
       default:
         alert("Opción no reconocida!");
