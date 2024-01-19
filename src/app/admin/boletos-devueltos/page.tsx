@@ -1,23 +1,33 @@
 "use client";
+import swal from 'sweetalert';
 import * as React from 'react';
 import { BrowserQRCodeReader, MultiFormatReader } from '@zxing/library';
-import { Button, Col, Flex, Row } from 'antd';
+import { Button, Col, Flex, List, Row } from 'antd';
 import {
-  DollarOutlined,
+  CheckCircleOutlined,
+  WarningOutlined,
   QrcodeOutlined,
   SafetyOutlined
 } from '@ant-design/icons';
+import { useActualizarBoletosDevueltosMutation, useBoletosDevueltosMutation } from '@/services/userApi';
+import { setListaDeBoletosADevolver } from '@/features/adminSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 var selectedDeviceId: any;
 var valueQR: string = "";
 
 const BoletosDEvueltos = () => {
 
+  const dispatch = useDispatch();
+  const listaDeBoletosADevolver = useSelector((state: any) => state.admin.listaDeBoletosADevolver);
+
   const videoRef = React.useRef<any>(null);
   const audioRef = React.useRef<any>(null);
   const codeReader = React.useRef<any>(new BrowserQRCodeReader());
 
   const [arrayQR, setArrayQR] = React.useState<string[]>([]);
+  const [boletosDevueltos] = useBoletosDevueltosMutation();
+  const [actualizarBoletosDevueltos, { data, error, isLoading }] = useActualizarBoletosDevueltosMutation();
 
   function decodeContinuously(codeReader: any, selectedDeviceId: any) {
     codeReader.decodeFromInputVideoDeviceContinuously(selectedDeviceId, videoRef.current, async (result: any, err: any) => {
@@ -25,7 +35,9 @@ const BoletosDEvueltos = () => {
         if (result.text.toString() != valueQR.toString()) {
           audioRef.current.play();
           valueQR = result.text.toString();
-          setArrayQR((qrs: any) => [...qrs, result.text.toString()]);
+
+          const [_idBoleto] = result.text.toString().split("/").reverse();
+          setArrayQR((qrs: any) => [...qrs, _idBoleto]);
         }
       }
     });
@@ -35,7 +47,7 @@ const BoletosDEvueltos = () => {
     codeReader.current.getVideoInputDevices()
       .then((videoInputDevices: any) => {
         const rearCamera = videoInputDevices.find((device: any) => device.label.includes('back'));
-        selectedDeviceId = (rearCamera?.deviceId || videoInputDevices[0].deviceId);
+        selectedDeviceId = (rearCamera?.deviceId || videoInputDevices[0]?.deviceId);
       });
     return () => {
       codeReader.current.reset();
@@ -45,7 +57,7 @@ const BoletosDEvueltos = () => {
   return (
     <React.Suspense>
       <Row gutter={16}>
-        <Col className="gutter-row" xs={24} sm={24} md={12} lg={8}>
+        <Col className="gutter-row" xs={24} sm={24} md={12} lg={10}>
           <Flex gap="small" style={{ width: '100%', marginBottom: ".5rem" }}>
             <Button icon={<QrcodeOutlined />} onClick={() => {
               decodeContinuously(codeReader.current, selectedDeviceId);
@@ -66,9 +78,11 @@ const BoletosDEvueltos = () => {
               width: "40px",
               height: "40px",
               borderRadius: ".5rem",
+              color: "white",
               position: "absolute",
-              bottom: 12,
-              right: 0
+              background: "#001529",
+              bottom: 15,
+              right: 3
             }}><strong style={{ fontSize: "1.5rem" }}>{arrayQR.length}</strong></div>
             <video ref={videoRef} style={{
               width: "100%",
@@ -79,14 +93,55 @@ const BoletosDEvueltos = () => {
           </div>
 
           <Flex vertical gap="small" style={{ width: '100%' }}>
-            <Button icon={<SafetyOutlined />} onClick={() => {
+            <Button icon={<SafetyOutlined />} onClick={async () => {
+              if (!Boolean(arrayQR.length)) return;
+              const { data }: any = await boletosDevueltos({ boletos: JSON.stringify(arrayQR) });
+              const filterJugados = data.filter((boleto: any) => !boleto.estadoMenor);
+              const filterValidados = data.filter((boleto: any) => !boleto.estadoMenor);
+              if (Boolean(filterJugados.length)) {
+                let text = `${filterJugados.length} boletos ya han sido jugados`;
+                if (Boolean(filterValidados.length)) {
+                  text += `, ${filterValidados.length} boletos ya han sido validados!`
+                }
+                swal("Alerta", text, "warning");
+              }
 
+              dispatch(setListaDeBoletosADevolver(data));
+              setArrayQR([]);
             }} type="primary" block>
               Validar
             </Button>
           </Flex>
         </Col>
-        <Col className="gutter-row" xs={24} sm={24} md={12} lg={16}>
+        <Col className="gutter-row" xs={24} sm={24} md={24} lg={4}></Col>
+        <Col className="gutter-row" xs={24} sm={24} md={12} lg={10}>
+          <List
+            size="small"
+            header={<div>{`Lista de boletos a validar : ${listaDeBoletosADevolver.length}`}</div>}
+            bordered
+            dataSource={listaDeBoletosADevolver}
+            renderItem={(item: any) => (
+              <List.Item key={item._id}>
+                {`Boleto: ${item.premioMayor} - ${item.premioMenor} Premio: ${item.premio.toFixed(2)} `}
+                {(item.estadoMenor && item.estado) ? <CheckCircleOutlined style={{ color: "green" }} /> : <WarningOutlined style={{ color: "red" }} />}
+              </List.Item>
+            )}
+          />
+          {Boolean(listaDeBoletosADevolver.length) && (
+            <Flex vertical gap="small" style={{ width: '100%' }}>
+              <Button type="primary" block onClick={async () => {
+                await actualizarBoletosDevueltos({
+                  boletos: JSON.stringify(listaDeBoletosADevolver.filter((b: any) => {
+                    return b.estadoMenor && b.estado;
+                  }))
+                });
+                dispatch(setListaDeBoletosADevolver([]));
+                swal("", `Boletos sobrantes actualizados!`, "success");
+              }}>
+                Actualizar
+              </Button>
+            </Flex>
+          )}
           <audio style={{ display: "none" }} ref={audioRef}>
             <source src="../../../store-scanner-beep-90395.mp3" type="audio/mpeg" />
           </audio>

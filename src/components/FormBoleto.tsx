@@ -1,46 +1,64 @@
 "use client"
-import React, { useRef } from 'react';
-import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { AutoComplete, Button, Drawer, Flex, Form, Input, InputNumber, List, Select, Space } from 'antd';
-import { useDispatch, useSelector } from 'react-redux';
-import { setListaDeBoletos, setOpenFormBoleto } from '@/features/adminSlice';
-import { useListarBoletosMutation, useListarSegundosGanadoresMutation, useRegistrarPremioBoletosMutation } from '@/services/userApi';
 import swal from 'sweetalert';
-
+import * as React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { MinusCircleOutlined } from '@ant-design/icons';
+import { AutoComplete, Button, Drawer, Flex, Form, Input, List, Select, Space } from 'antd';
+import { useListarBoletosQueryQuery, useRegistrarPremioBoletosMutation } from '@/services/userApi';
+import { setListaDeBoletos, setListaDeBoletosConPremio, setOpenFormBoleto } from '@/features/adminSlice';
 
 const FormBoleto: React.FC = () => {
 
   const dispatch = useDispatch();
-
   const [value, setValue] = React.useState('');
 
-  const { openFormBoleto, rifaDetalles, listaDeBoletos } = useSelector((state: any) => state.admin);
-  const [listarBoletos, {
-    data: dataMu,
-    error: errorMU,
-    isLoading: isLoadingMu
-  }] = useListarBoletosMutation();
-  const [registrarPremioBoletos, { isLoading: isLoadingRegistrar }] = useRegistrarPremioBoletosMutation();
+  const {
+    openFormBoleto,
+    rifaDetalles,
+    listaDeBoletos,
+    listaDeBoletosConPremio
+  } = useSelector((state: any) => state.admin);
 
-  const boletosConPremio = listaDeBoletos
-    .filter((b: any) => Boolean(b.premio));
+  const {
+    data,
+    error,
+    isLoading
+  } = useListarBoletosQueryQuery({ _idRifa: rifaDetalles?._id });
+  React.useEffect(() => {
+    if (data) {
+      dispatch(setListaDeBoletos(data));
+    }
+  }, [data]);
+
+  const {
+    data: dataBoletosGanadores,
+    error: errorBoletosGanadores,
+    refetch
+  } = useListarBoletosQueryQuery({ _idRifa: rifaDetalles?._id, boletosGanadores: true });
+  React.useEffect(() => {
+    if (dataBoletosGanadores) {
+      dispatch(setListaDeBoletosConPremio(dataBoletosGanadores));
+    }
+  }, [dataBoletosGanadores]);
+
+  const [registrarPremioBoletos, { isLoading: isLoadingRegistrar }] = useRegistrarPremioBoletosMutation();
 
   const boletosSinPremio = listaDeBoletos
     .map((b: any) => ({ value: b.premioMenor }));
 
-
   const [form] = Form.useForm();
   const refBoletos = React.useRef<any>();
 
-
   const onFinish = (values: any) => {
 
-    registrarPremioBoletos({ boletos: JSON.stringify(values.boletos) }).then(async () => {
-      swal("", "Los boletos se actualizaron correctamente!", "success");
-      form.resetFields();
-      const { data = [] }: any = await listarBoletos({ _idRifa: rifaDetalles._id });
-      dispatch(setListaDeBoletos(data));
-    })
+    if (!Boolean(Object.keys(values?.boletos).length)) return;
+
+    registrarPremioBoletos({ boletos: JSON.stringify(values.boletos) })
+      .then(async () => {
+        swal("", "Los boletos se actualizaron correctamente!", "success");
+        form.resetFields();
+        refetch();
+      });
   };
 
 
@@ -56,10 +74,10 @@ const FormBoleto: React.FC = () => {
           paddingBottom: 80,
         },
       }}>
-
       <AutoComplete
         allowClear
         bordered
+        disabled={isLoading}
         value={value}
         style={{ width: "100%", marginBottom: "12px" }}
         options={boletosSinPremio}
@@ -96,15 +114,9 @@ const FormBoleto: React.FC = () => {
                   return (
                     <Space key={key} style={{ display: 'flex', justifyContent: "space-between", width: "100%", marginBottom: 8 }} align="baseline">
                       <Form.Item
-                        label={`1N° (${boleto.premioMayor})`}
+                        label={`Boleto: ${boleto.premioMayor} - ${boleto.premioMenor}`}
                         {...restField}
                         name={[name, 'premioMayor']}
-                      >
-                      </Form.Item>
-                      <Form.Item
-                        label={`2N° (${boleto.premioMenor})`}
-                        {...restField}
-                        name={[name, 'premioMenor']}
                       >
                       </Form.Item>
                       <Form.Item
@@ -132,18 +144,13 @@ const FormBoleto: React.FC = () => {
                           <Select.Option value="320000">320 mil</Select.Option>
                           <Select.Option value="600000">600 mil</Select.Option>
                           <Select.Option value="1200000">1.2 millones</Select.Option>
+                          <Select.Option value="9">sorpresa</Select.Option>
                         </Select>
-                        {/* <InputNumber placeholder="Premio" /> */}
                       </Form.Item>
                       <MinusCircleOutlined onClick={() => remove(name)} />
                     </Space>
                   )
                 })}
-                {/* <Form.Item>
-                  <Button type="dashed" disabled onClick={() => add()} block icon={<PlusOutlined />}>
-                    Agregar boleto
-                  </Button>
-                </Form.Item> */}
               </>
             )
           }}
@@ -159,10 +166,16 @@ const FormBoleto: React.FC = () => {
 
       <List
         size="small"
-        header={<div>{`Lista de 2N° ganadores : ${boletosConPremio.length}`}</div>}
+        header={<div>{`Lista de 2N° ganadores : ${listaDeBoletosConPremio.length}`}</div>}
         bordered
-        dataSource={boletosConPremio}
-        renderItem={(item: any) => <List.Item>{`Boleto : ${item.premioMenor} Premio: ${item.premio.toFixed(2)}`}</List.Item>}
+        dataSource={listaDeBoletosConPremio}
+        renderItem={(item: any) => {
+          return (
+            <List.Item>
+              {`Boleto: ${item.premioMayor} - ${item.premioMenor} Premio: ${item.premio == 9 ? "Sorpresa" : item.premio.toFixed(2)}`}
+            </List.Item>
+          )
+        }}
       />
     </Drawer>
   )

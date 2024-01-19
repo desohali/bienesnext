@@ -1,11 +1,12 @@
 "use client";
 import React from 'react';
-import { Form, Input, Button, Row, Col, Card, Tag, Typography, Spin } from 'antd';
-import { ArrowRightOutlined } from '@ant-design/icons';
+import swal from 'sweetalert';
 import { useRouter } from 'next/navigation';
-import { useSelector, useDispatch } from 'react-redux';
 import { setUser } from '@/features/userSlice';
+import { ArrowRightOutlined } from '@ant-design/icons';
+import { useSelector, useDispatch } from 'react-redux';
 import { useLoginValidadorQRMutation } from '@/services/userApi';
+import { Form, Input, Button, Row, Col, Card, Tag, Typography, Spin } from 'antd';
 const { Text } = Typography;
 
 const layout = {
@@ -24,7 +25,7 @@ const App: React.FC = () => {
 
   const [autenticarUsuario, { data, error, isLoading }] = useLoginValidadorQRMutation();
   React.useEffect(() => {
-    if (data) {
+    if (data && data?.tipoUsuario != "v") {
       window.localStorage.setItem("usuario", JSON.stringify(data));
       dispatch(setUser(data));
     }
@@ -67,7 +68,10 @@ const App: React.FC = () => {
             usuario: '',
             password: ''
           }} onFinish={async (values) => {
-            await autenticarUsuario(values);
+            const { data }: any = await autenticarUsuario(values);
+            if (!data || data?.tipoUsuario == "v") {
+              swal("Alerta", "Usuario no autorizado!", "warning");
+            }
           }} requiredMark={customizeRequiredMark}>
             <Form.Item label={<Text>Usuario</Text>} name="usuario" rules={[{ required: true, message: 'Por favor ingrese usuario!' }]}>
               <Input />

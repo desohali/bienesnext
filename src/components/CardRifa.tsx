@@ -5,7 +5,7 @@ import { Button, Card, Tooltip } from 'antd';
 import { useRouter } from 'next/navigation';
 import { setListaDeBoletos, setOpenFormBoleto, setOpenFormRifa, setRifaDetalles } from '@/features/adminSlice';
 import { useDispatch } from 'react-redux';
-import { useListarBoletosMutation } from '@/services/userApi';
+import { useListarBoletosMutation, useListarBoletosQueryQuery } from '@/services/userApi';
 const { PDFDocument, rgb } = require('pdf-lib');
 const QRCode = require('qrcode');
 
@@ -163,14 +163,13 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
     // window.open(pdfUrl);
   };
 
-
   const router = useRouter();
   const dispatch = useDispatch();
 
   const [listarBoletos, {
-    data: dataMu,
-    error: errorMU,
-    isLoading: isLoadingMu
+    data,
+    error,
+    isLoading
   }] = useListarBoletosMutation();
 
   React.useEffect(() => {
@@ -229,7 +228,7 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
             e.stopPropagation();
             setloading(true);
             const { data = [] }: any = await listarBoletos({ _idRifa: rifa._id });
-            /* dispatch(setListaDeBoletos(data)); */
+            dispatch(setListaDeBoletos(data));
             await descargarBoletos(data);
 
           }} shape="circle" icon={<CloudDownloadOutlined />} />
@@ -237,9 +236,6 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
         <Tooltip title="2N° ganadores">
           <Button type="primary" onClick={async (e) => {
             e.stopPropagation();
-            const { data = [] }: any = await listarBoletos({ _idRifa: rifa._id });
-            dispatch(setListaDeBoletos(data));
-
             dispatch(setOpenFormBoleto(true));
             dispatch(setRifaDetalles(rifa));
           }} shape="circle" icon={<EyeOutlined />} />

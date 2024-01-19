@@ -8,7 +8,9 @@ const initialState: any = {
   listaDeRifas: [],
   rifaDetalles: null,
   isRifa: false,
-  listaDeBoletos: []
+  listaDeBoletos: [],
+  listaDeBoletosConPremio: [],
+  listaDeBoletosADevolver: []
 };
 
 export const adminSlice = createSlice({
@@ -36,6 +38,12 @@ export const adminSlice = createSlice({
     setListaDeBoletos: (state, action) => {
       state.listaDeBoletos = action.payload;
     },
+    setListaDeBoletosConPremio: (state, action) => {
+      state.listaDeBoletosConPremio = action.payload;
+    },
+    setListaDeBoletosADevolver: (state, action) => {
+      state.listaDeBoletosADevolver = action.payload;
+    },
   },
 });
 
@@ -47,7 +55,9 @@ export const {
   setIsRifa,
   setRifaDetalles,
   setOpenFormBoleto,
-  setListaDeBoletos
+  setListaDeBoletos,
+  setListaDeBoletosConPremio,
+  setListaDeBoletosADevolver
 } = adminSlice.actions;
 
 export default adminSlice.reducer;

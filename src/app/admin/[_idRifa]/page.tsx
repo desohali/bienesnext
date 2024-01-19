@@ -1,6 +1,5 @@
 "use client";
 import React from 'react';
-import swal from 'sweetalert';
 import Marquee from 'react-fast-marquee';
 import { setRifaDetalles } from '@/features/adminSlice';
 import { useBuscarBoletoMutation, useBuscarRifaMutation } from '@/services/userApi';

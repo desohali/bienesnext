@@ -24,6 +24,11 @@ const FormRifa: React.FC<{ formRifa: any }> = ({ formRifa }) => {
   const style: React.CSSProperties = { width: '100%' };
   const [registrarRifa, { data, error, isLoading }] = useRegistrarRifaMutation();
 
+  const [fechaMinima, setFechaMinima] = React.useState('');
+  React.useEffect(() => {
+    setFechaMinima(new Date().toISOString().split('T')[0]);
+  }, []);
+
 
   return (
     <>
@@ -53,12 +58,16 @@ const FormRifa: React.FC<{ formRifa: any }> = ({ formRifa }) => {
             color: "#008080"
           }}
           onFinish={async (values) => {
-            await registrarRifa(values);
+            const rifa = await registrarRifa(values);
+            if (!rifa) {
+              swal("", `Error en la rifa que intentaste ${existeIdRifa ? 'actualizar' : 'registrar'}!`, "error");
+              return;
+            }
             dispatch(setIsRifa(true));
             dispatch(setOpenFormRifa(false));
             setTimeout(() => { dispatch(setIsRifa(false)) }, 10);
             formRifa.resetFields();
-            swal("", `Rifa ${existeIdRifa ? 'Actualizada' : 'Registrada'}!`, "success");
+            swal("", `Rifa ${existeIdRifa ? 'actualizada' : 'registrada'}!`, "success");
           }} >
           <Row gutter={16}>
             <Col xs={12} sm={12} md={12} lg={12}>
@@ -83,7 +92,7 @@ const FormRifa: React.FC<{ formRifa: any }> = ({ formRifa }) => {
                 label="Fecha"
                 rules={[{ required: true, message: 'Por favor, ingrese fecha' }]}
               >
-                <Input type='date' placeholder="Fecha" style={style} />
+                <Input type='date' placeholder="Fecha" min={fechaMinima} style={style} />
               </Form.Item>
             </Col>
           </Row>

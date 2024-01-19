@@ -2,16 +2,13 @@
 import React from 'react';
 import {
   MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  HomeFilled,
-  UserOutlined,
   LogoutOutlined,
   UsergroupAddOutlined,
   QrcodeOutlined,
   GiftOutlined,
   SketchOutlined,
 } from '@ant-design/icons';
-import { Layout, Menu, theme, Spin, Breadcrumb, Drawer, Space, DrawerProps, Typography } from 'antd';
+import { Layout, Menu, theme, Spin, Breadcrumb, Drawer, Space, DrawerProps, Typography, Flex, Button } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { setMenuButtonKey } from '@/features/adminSlice';
 import { Footer } from 'antd/es/layout/layout';
@@ -25,15 +22,14 @@ enum OpcionesMenu {
   Usuarios = 'Usuarios',
   PremiosQR = 'PremiosQR',
   ValidadorQR = 'ValidadorQR',
-  cerrarSesion = 'cerrarSesion'
 }
-const url = "https://bienesnext.vercel.app/admin";
 
 const App: React.FC = ({ children }: any) => {
 
   const router = useRouter();
   const dispatch = useDispatch();
-  const menuButtonKey = useSelector((state: any) => state.admin.menuButtonKey);
+  const { menuButtonKey } = useSelector((state: any) => state.admin);
+  const { user } = useSelector((state: any) => state.user);
 
   const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
@@ -42,29 +38,29 @@ const App: React.FC = ({ children }: any) => {
 
   const handleMenuClick = (e: any) => {
     // Verificar la opción seleccionada
+    const pathnameLength = location.pathname.split("/").length - 2;
+    let path = "";
+    for (let index = 0; index < pathnameLength; index++) {
+      path += "../";
+    }
+
     switch (e.key as OpcionesMenu) {
       case OpcionesMenu.Rifas:
-        router.push(url + '/rifas');
+        router.push(`${path}admin/rifas`);
         break;
       case OpcionesMenu.Usuarios:
-        router.push(url + '/usuarios');
+        router.push(`${path}admin/usuarios`);
         break;
       case OpcionesMenu.PremiosQR:
-        router.push(url + '/premios');
+        router.push(`${path}admin/premios`);
         break;
       case OpcionesMenu.ValidadorQR:
-        router.push(url + '/boletos-devueltos');
-        break;
-      default:
-        window.localStorage.removeItem("usuario");
-        dispatch(setUser(null));
-        router.push('https://bienesnext.vercel.app/login');
+        router.push(`${path}admin/boletos-devueltos`);
         break;
     }
     dispatch(setMenuButtonKey(e.key as OpcionesMenu));
     setOpen(false);
   };
-
 
   const {
     token: { colorBgContainer },
@@ -83,33 +79,48 @@ const App: React.FC = ({ children }: any) => {
     setOpen(false);
   };
 
-  const menu: any = [
-    {
-      key: OpcionesMenu.Rifas,
-      icon: <SketchOutlined />,
-      label: 'Rifas',
-    },
-    {
-      key: OpcionesMenu.Usuarios,
-      icon: <UsergroupAddOutlined />,
-      label: 'Usuarios',
-    },
-    {
-      key: OpcionesMenu.PremiosQR,
-      icon: <GiftOutlined />,
-      label: 'Premios QR',
-    },
-    {
-      key: OpcionesMenu.ValidadorQR,
-      icon: <QrcodeOutlined />,
-      label: 'Validador QR',
-    },
-    {
-      key: OpcionesMenu.cerrarSesion,
-      icon: <LogoutOutlined />,
-      label: 'Cerrar Sesión',
-    },
-  ];
+  const menu: any[] = [];
+
+  if (user) {
+    if (user?.tipoUsuario == "s") {// super usuario
+      menu.push(
+        {
+          key: OpcionesMenu.Rifas,
+          icon: <SketchOutlined />,
+          label: 'Rifas',
+        },
+        {
+          key: OpcionesMenu.Usuarios,
+          icon: <UsergroupAddOutlined />,
+          label: 'Usuarios',
+        },
+        {
+          key: OpcionesMenu.PremiosQR,
+          icon: <GiftOutlined />,
+          label: 'Premios QR',
+        },
+        {
+          key: OpcionesMenu.ValidadorQR,
+          icon: <QrcodeOutlined />,
+          label: 'Validador QR',
+        }
+      );
+    }
+    if (user?.tipoUsuario == "a") {// administrador
+      menu.push(
+        {
+          key: OpcionesMenu.PremiosQR,
+          icon: <GiftOutlined />,
+          label: 'Premios QR',
+        },
+        {
+          key: OpcionesMenu.ValidadorQR,
+          icon: <QrcodeOutlined />,
+          label: 'Validador QR',
+        }
+      );
+    }
+  }
 
   if (loading) {
     return (
@@ -130,6 +141,7 @@ const App: React.FC = ({ children }: any) => {
           items={[{ key: "Rifas", icon: <MenuFoldOutlined style={{ fontSize: "18px", marginLeft: "12px" }} /> }]}
           onClick={showDefaultDrawer}
         />
+
         <Space direction="vertical" style={{ margin: "auto" }}>
           <Title style={{ color: "white", marginBottom: "4px" }} level={3}>Rifa el medallón</Title>
         </Space>
@@ -149,6 +161,21 @@ const App: React.FC = ({ children }: any) => {
             mode="inline"
             items={menu}
           />
+          <Flex vertical gap="small" style={{ width: '100%' }}>
+            <Button icon={<LogoutOutlined />} onClick={() => {
+              window.localStorage.removeItem("usuario");
+              dispatch(setUser(null));
+
+              const pathnameLength = location.pathname.split("/").length - 2;
+              let path = "";
+              for (let index = 0; index < pathnameLength; index++) {
+                path += "../";
+              }
+              router.push(`${path}login`);
+            }} type="primary" block danger>
+              Cerrar Sesión
+            </Button>
+          </Flex>
         </Drawer>
         <Breadcrumb
           items={menu.filter((m: any) => m.key == menuButtonKey).map((m: any) => ({
@@ -164,7 +191,9 @@ const App: React.FC = ({ children }: any) => {
           {children}
         </div>
       </Content>
-      <Footer style={{ textAlign: 'center' }}>Ant Design ©2023 Created by Ant UED</Footer>
+      <Footer style={{ textAlign: 'center' }}>
+        <Title level={5}>Copyright ©2024 | Rifa el medallón. Todos los derechos reservados.</Title>
+      </Footer>
     </Layout>
   );
 };

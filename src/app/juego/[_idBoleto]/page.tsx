@@ -93,11 +93,11 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
           (params.get('longitude') || '')
         ];
         if (!_idUsuario) {
-          swal("", "Usuario no autorizado!", "info");
+          swal("Alerta", "Usuario no autorizado!", "info");
           return;
         }
         if (!latitude || !longitude) {
-          swal("", "Datos de ubicación incompletos!", "info");
+          swal("Alerta", "Datos de ubicación incompletos!", "info");
           return;
         }
 
@@ -148,8 +148,8 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
         ctx.strokeStyle = "white";
         if (boletoDetalles.estadoMenor) {
           ctx.font = "bold 48px serif";
-          ctx.fillText(boletoDetalles?.fechaRegistro, 50, 50);
-          ctx.strokeText(boletoDetalles?.fechaRegistro, 50, 50);
+          ctx.fillText(boletoDetalles?.fechaRifa, 50, 50);
+          ctx.strokeText(boletoDetalles?.fechaRifa, 50, 50);
           // Dibujamos el texto de las fechas
           ctx.font = "bold 58px serif";
 
@@ -160,8 +160,8 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
           ctx.strokeText(boletoDetalles?.premioMenor, 250, ((height / 2) + 127.5));
         } else {
           ctx.font = "bold 48px serif";
-          ctx.fillText(boletoDetalles?.fechaRegistro, 50, 50);
-          ctx.strokeText(boletoDetalles?.fechaRegistro, 50, 50);
+          ctx.fillText(boletoDetalles?.fechaRifa, 50, 50);
+          ctx.strokeText(boletoDetalles?.fechaRifa, 50, 50);
           ctx.font = "bold 36px serif";
           if (boletoDetalles?.premio) {
             ctx.fillStyle = "white";

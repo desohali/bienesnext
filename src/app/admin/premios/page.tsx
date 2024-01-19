@@ -1,6 +1,6 @@
 "use client";
 import * as React from 'react';
-import { Alert, Button, Col, Divider, Flex, List, Row, Select, notification } from 'antd';
+import { Alert, Button, Col, Divider, Flex, Form, Input, List, Row, Select, Tag, Typography, notification } from 'antd';
 import { useBuscarBoletoMutation, useListarBoletosPagadosMutation, usePagarBoletoMutation } from '@/services/userApi';
 import { BrowserCodeReader, MultiFormatReader, BrowserQRCodeReader } from '@zxing/library';
 import {
@@ -11,7 +11,40 @@ import {
 var selectedDeviceId: any;
 var valueQR: string = "";
 
+const { Text } = Typography;
+
+const layout = {
+  labelCol: { span: 8 },
+  wrapperCol: { span: 16 },
+};
+
+const customizeRequiredMark = (label: React.ReactNode, { required }: { required: boolean }) => (
+  <>
+    {required ? <Tag color="error">Required</Tag> : <Tag color="warning">optional</Tag>}
+    {label}
+  </>
+);
+const fechaEstandar = () => {
+  const myFecha = new Date(),
+    diferenciaMinutos = myFecha.getTimezoneOffset();
+
+  if (/^-/.test(diferenciaMinutos.toString())) {
+    myFecha.setMinutes(myFecha.getMinutes() + Math.abs(diferenciaMinutos));
+  } else {
+    myFecha.setMinutes(myFecha.getMinutes() - Math.abs(diferenciaMinutos));
+  }
+
+  return myFecha.toISOString().split('T')[0];
+};
+
 const Premios = () => {
+
+  const [formBoletos] = Form.useForm();
+  const [date, setDate] = React.useState<string>("");
+  React.useEffect(() => {
+    setDate(fechaEstandar());
+    formBoletos.setFieldsValue({ date: fechaEstandar() });
+  }, []);
 
   const videoRef = React.useRef<any>(null);
   const audioRef = React.useRef<any>(null);
@@ -27,17 +60,17 @@ const Premios = () => {
   const openNotification = (data: any) => {
     api.info({
       message: `Boleto : ${data?.premioMenor} pagado!`,
-      description: 'El boleto fue pagado, se listará en premios pagados, gracias!',
+      description: 'El boleto fue pagado, se listará en boletos pagados, gracias!',
       placement: 'bottomRight',
     });
   };
   // notificaciones end
 
   React.useEffect(() => {
-    (async () => {
-      await listarBoletosPagados({});
-    })();
-  }, []);
+    if (date) {
+      listarBoletosPagados({ date });
+    }
+  }, [date]);
 
   function decodeContinuously(codeReader: any, selectedDeviceId: any) {
     codeReader.decodeFromInputVideoDeviceContinuously(selectedDeviceId, videoRef.current, async (result: any, err: any) => {
@@ -45,7 +78,7 @@ const Premios = () => {
         if (result.text.toString() != valueQR.toString()) {
           audioRef.current.play();
           valueQR = result.text.toString();
-          const findBoleto = await buscarBoleto({ _id: result.text.split("/").reverse()[0] });
+          await buscarBoleto({ _id: result.text.split("/").reverse()[0] });
         }
       }
     });
@@ -55,14 +88,13 @@ const Premios = () => {
     codeReader.current.getVideoInputDevices()
       .then((videoInputDevices: any) => {
         const rearCamera = videoInputDevices.find((device: any) => device.label.includes('back'));
-        selectedDeviceId = (rearCamera?.deviceId || videoInputDevices[0].deviceId);
+        selectedDeviceId = (rearCamera?.deviceId || videoInputDevices[0]?.deviceId);
       });
     return () => {
       codeReader.current.reset();
     }
   }, []);
 
-  const [selectValue, setSelectValue] = React.useState(undefined);
   const [isLargeScreen, setIsLargeScreen] = React.useState(false);
 
   React.useEffect(() => {
@@ -85,7 +117,7 @@ const Premios = () => {
     <React.Suspense>
       <Row gutter={16}>
 
-        <Col className="gutter-row" xs={24} sm={24} md={12} lg={8}>
+        <Col className="gutter-row" xs={24} sm={24} md={12} lg={10}>
 
           <Flex gap="small" style={{ width: '100%', marginBottom: ".5rem" }}>
             <Button icon={<QrcodeOutlined />} onClick={() => {
@@ -142,7 +174,7 @@ const Premios = () => {
                 <Flex vertical gap="small" style={{ width: '100%' }}>
                   <Button icon={<DollarOutlined />} onClick={async () => {
                     await pagarBoleto({ _id: data._id });
-                    await listarBoletosPagados({});
+                    await listarBoletosPagados({ date });
                     await buscarBoleto({ _id: data._id });
                     openNotification(data);
                   }} type="primary" block>
@@ -153,62 +185,35 @@ const Premios = () => {
             </>
           )}
         </Col>
-        <Col className="gutter-row" xs={24} sm={24} md={0} lg={8}>
+        <Col className="gutter-row" xs={24} sm={24} md={24} lg={4}>
           <audio style={{ display: "none" }} ref={audioRef}>
             <source src="../../../store-scanner-beep-90395.mp3" type="audio/mpeg" />
           </audio>
         </Col>
-        <Col className="gutter-row" xs={24} sm={24} md={12} lg={8}>
+        <Col className="gutter-row" xs={24} sm={24} md={12} lg={10}>
           {contextHolder}
           {isLargeScreen && <Divider>2N° ganadores</Divider>}
-          <Select
-            showSearch
-            allowClear
-            value={selectValue}
-            onChange={(data: any) => {
-              setSelectValue(data);
-            }}
-            style={{ width: "100%", marginBottom: ".5rem" }}
-            placeholder="Seleccione rifa"
-            optionFilterProp="children"
-            filterOption={(input: any, option: any) => (option?.label ?? '').includes(input)}
-            filterSort={(optionA: any, optionB: any) =>
-              (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-            }
-            options={[
-              {
-                value: '1',
-                label: 'Not Identified',
-              },
-              {
-                value: '2',
-                label: 'Closed',
-              },
-              {
-                value: '3',
-                label: 'Communicated',
-              },
-              {
-                value: '4',
-                label: 'Identified',
-              },
-              {
-                value: '5',
-                label: 'Resolved',
-              },
-              {
-                value: '6',
-                label: 'Cancelled',
-              },
-            ]}
-          />
+          <Form {...layout}
+            form={formBoletos}
+            name="login-form"
+            initialValues={{ date: '' }}
+            requiredMark={customizeRequiredMark}>
+            <Form.Item label={<Text>Fecha</Text>} name="date" rules={[{ required: true, message: 'Por favor seleccione fecha!' }]}>
+              <Input type='date' onChange={async (e: any) => {
+                setDate(e.target.value);
+                await listarBoletosPagados({ date: e.target.value });
+              }} />
+            </Form.Item>
+          </Form>
           <List
             size="small"
             header={<div>{`Lista de boletos pagados : ${dataList.length}`}</div>}
             bordered
             dataSource={dataList}
             renderItem={(item: any) => (
-              <List.Item>{`Boleto : ${item.premioMenor} Premio: ${item.premio.toFixed(2)} pagado!`}</List.Item>
+              <List.Item key={item._id}>
+                {`Boleto: ${item.premioMayor} - ${item.premioMenor} Premio: ${item.premio.toFixed(2)}`}
+              </List.Item>
             )}
           />
         </Col>

@@ -12,7 +12,7 @@ import FormBoleto from '@/components/FormBoleto';
 const Rifas: React.FC = () => {
 
   const dispatch = useDispatch();
-  const { listaDeRifas, isRifa } = useSelector((state: any) => state.admin);
+  const { listaDeRifas, isRifa, rifaDetalles } = useSelector((state: any) => state.admin);
   const [formRifa] = Form.useForm();
 
   const { data, error, isLoading, refetch } = useListarRifasQuery({});
@@ -42,7 +42,7 @@ const Rifas: React.FC = () => {
             </Button>
           </Flex>
           <FormRifa formRifa={formRifa} />
-          <FormBoleto />
+          {rifaDetalles && <FormBoleto />}
         </Col>
         <Col className="gutter-row" xs={24} sm={4} md={4} lg={8}>
         </Col>

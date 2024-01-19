@@ -53,6 +53,17 @@ export const userApi = createApi({
       },
       //transformResponse: (response: any, meta, arg) => response.data,
     }),
+    listarBoletosQuery: builder.query({
+      query: (variables) => {
+        return {
+          url: 'listarBoletos',
+          method: 'get',
+          params: variables,// get no lleva body lleva params
+          headers: { uid: "token" },
+        }
+      },
+      //transformResponse: (response: any, meta, arg) => response.data,
+    }),
     buscarRifa: builder.mutation({
       query: (variables) => {
         return {
@@ -164,6 +175,28 @@ export const userApi = createApi({
       },
       //transformResponse: (response: any, meta, arg) => response.data,
     }),
+    boletosDevueltos: builder.mutation({
+      query: (variables) => {
+        return {
+          url: 'boletosDevueltos',
+          method: 'post',
+          body: variables,
+          headers: { uid: "token" },
+        }
+      },
+      //transformResponse: (response: any, meta, arg) => response.data,
+    }),
+    actualizarBoletosDevueltos: builder.mutation({
+      query: (variables) => {
+        return {
+          url: 'actualizarBoletosDevueltos',
+          method: 'post',
+          body: variables,
+          headers: { uid: "token" },
+        }
+      },
+      //transformResponse: (response: any, meta, arg) => response.data,
+    }),
   }),
 });
 
@@ -183,5 +216,8 @@ export const {
   usePagarBoletoMutation,
   useRegistrarUsuarioMutation,
   useLoginValidadorQRMutation,
-  useListarBoletosVendidosMutation
+  useListarBoletosVendidosMutation,
+  useListarBoletosQueryQuery,
+  useBoletosDevueltosMutation,
+  useActualizarBoletosDevueltosMutation
 } = userApi;

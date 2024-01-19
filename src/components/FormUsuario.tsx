@@ -56,16 +56,18 @@ const FormUsuario: React.FC<{ formUsuario: any }> = ({ formUsuario }) => {
             usuario: "",
             password: "",
             tipoUsuario: "v",
-            estado: "a",
+            estado: true,
             descripcion: ""
           }}
           onFinish={async (values) => {
+            console.log('values', values)
+            return;
             await registrarUsuario(values);
             dispatch(setIsUsuario(true));
             dispatch(setOpenFormUsuario(false));
             setTimeout(() => { dispatch(setIsUsuario(false)) }, 10);
             formUsuario.resetFields();
-            swal("", `Usuario ${existeIdUsuario ? 'Actualizado' : 'Registrado'}!`, "success");
+            swal("", `Usuario ${existeIdUsuario ? 'actualizado' : 'registrado'}!`, "success");
           }} >
           <Row gutter={16}>
             <Col xs={12} sm={12} md={12} lg={12}>
@@ -102,7 +104,7 @@ const FormUsuario: React.FC<{ formUsuario: any }> = ({ formUsuario }) => {
                 rules={[{ required: true, message: 'Por favor, seleccione tipo usuario' }]}
               >
                 <Select defaultValue="v" onChange={(e: any) => {
-                  setTipoUsuario(formUsuario.getFieldValue("tipoUsuario"));
+                  /* setTipoUsuario(formUsuario.getFieldValue("tipoUsuario")); */
                 }}>
                   <Select.Option value="v">Vendedor</Select.Option>
                   <Select.Option value="a">Administrador</Select.Option>
@@ -115,9 +117,9 @@ const FormUsuario: React.FC<{ formUsuario: any }> = ({ formUsuario }) => {
                 label="Estado"
                 rules={[{ required: true, message: 'Por favor, seleccione estado' }]}
               >
-                <Select defaultValue="a">
-                  <Select.Option value="a">Activo</Select.Option>
-                  <Select.Option value="i">Inactivo</Select.Option>
+                <Select defaultValue={true}>
+                  <Select.Option value={true}>Activo</Select.Option>
+                  <Select.Option value={false}>Inactivo</Select.Option>
                 </Select>
               </Form.Item>
             </Col>

@@ -19,6 +19,18 @@ const customizeRequiredMark = (label: React.ReactNode, { required }: { required:
     {label}
   </>
 );
+const fechaEstandar = () => {
+  const myFecha = new Date(),
+    diferenciaMinutos = myFecha.getTimezoneOffset();
+
+  if (/^-/.test(diferenciaMinutos.toString())) {
+    myFecha.setMinutes(myFecha.getMinutes() + Math.abs(diferenciaMinutos));
+  } else {
+    myFecha.setMinutes(myFecha.getMinutes() - Math.abs(diferenciaMinutos));
+  }
+
+  return myFecha.toISOString().split('T')[0];
+};
 
 const App: React.FC<{ params: any }> = ({ params }: any) => {
 
@@ -30,12 +42,8 @@ const App: React.FC<{ params: any }> = ({ params }: any) => {
   const listaDeBoletos = useSelector((state: any) => state.admin.listaDeBoletos);
 
   React.useEffect(() => {
-    const selectedDateNow = new Date();
-    // Crea una nueva fecha utilizando los componentes de la fecha y hora actual
-    const [selectedDate] = selectedDateNow.toISOString().split('T');
-    setDate(selectedDate);
-
-    formBoletos.setFieldsValue({ date: selectedDate });
+    setDate(fechaEstandar());
+    formBoletos.setFieldsValue({ date: fechaEstandar() });
   }, []);
 
 

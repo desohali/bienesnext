@@ -67,7 +67,7 @@ const Usuarios: React.FC = () => {
                 <Tooltip title="Detalles">
                   <Button type="primary" onClick={(e) => {
                     e.stopPropagation();
-                    router.push(`./boletos-vendidos/${usuario?._id}`);
+                    router.push(`./usuarios/${usuario?._id}`);
                   }} shape="circle" icon={<EyeOutlined />} />
                 </Tooltip>,
               ]}
