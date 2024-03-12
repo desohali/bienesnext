@@ -21,6 +21,7 @@ const imagenLoaded = (imageBase64: string) => {
   });
 };
 const crearBoleto = async (element: any, canvas: any, ctx: any, findRifa: any) => {
+
   const imageBase64 = await QRCode.toDataURL(`https://bienesnext.vercel.app/juego/${element._id}`, {
     width: 80,
     errorCorrectionLevel: 'L',
@@ -76,6 +77,9 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
     let y = widthPDF + 32/* - (159.75 * 4) */;
     let fila = 1;
     let numeroBoletos = 1;
+
+    canvas = canvas ?? document.getElementById(rifa._id);
+    ctx = ctx ?? canvas.getContext('2d');
 
     const boletosImages: any = [];
     for (const boleto of boletos) {

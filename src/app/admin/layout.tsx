@@ -27,13 +27,23 @@ enum OpcionesMenu {
 const App: React.FC = ({ children }: any) => {
 
   const router = useRouter();
+
   const dispatch = useDispatch();
   const { menuButtonKey } = useSelector((state: any) => state.admin);
+
   const { user } = useSelector((state: any) => state.user);
 
   const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
     setLoading(false);
+  }, []);
+
+  React.useEffect(() => {
+    const [, , path] = location.pathname.split("/");
+    const findMenuActive = (menu || []).find((m) => m?.path == path);
+    if (findMenuActive) {
+      dispatch(setMenuButtonKey(findMenuActive?.key));
+    }
   }, []);
 
   const handleMenuClick = (e: any) => {
@@ -58,6 +68,7 @@ const App: React.FC = ({ children }: any) => {
         router.push(`${path}admin/boletos-devueltos`);
         break;
     }
+
     dispatch(setMenuButtonKey(e.key as OpcionesMenu));
     setOpen(false);
   };
@@ -88,21 +99,25 @@ const App: React.FC = ({ children }: any) => {
           key: OpcionesMenu.Rifas,
           icon: <SketchOutlined />,
           label: 'Rifas',
+          path: 'rifas'
         },
         {
           key: OpcionesMenu.Usuarios,
           icon: <UsergroupAddOutlined />,
           label: 'Usuarios',
+          path: 'usuarios'
         },
         {
           key: OpcionesMenu.PremiosQR,
           icon: <GiftOutlined />,
           label: 'Premios QR',
+          path: 'premios'
         },
         {
           key: OpcionesMenu.ValidadorQR,
           icon: <QrcodeOutlined />,
           label: 'Validador QR',
+          path: 'boletos-devueltos'
         }
       );
     }
@@ -112,11 +127,13 @@ const App: React.FC = ({ children }: any) => {
           key: OpcionesMenu.PremiosQR,
           icon: <GiftOutlined />,
           label: 'Premios QR',
+          path: 'premios'
         },
         {
           key: OpcionesMenu.ValidadorQR,
           icon: <QrcodeOutlined />,
           label: 'Validador QR',
+          path: 'boletos-devueltos'
         }
       );
     }
@@ -134,13 +151,15 @@ const App: React.FC = ({ children }: any) => {
     <Layout className="layout" style={{ minHeight: "100vh" }}>
       <Header style={{ display: 'flex', alignItems: 'center' }}>
         <div className="demo-logo" />
-        <Menu
+        {/* <Menu
           theme="dark"
           mode="horizontal"
           defaultSelectedKeys={[menuButtonKey]}
-          items={[{ key: "Rifas", icon: <MenuFoldOutlined style={{ fontSize: "18px", marginLeft: "12px" }} /> }]}
+          items={[{ key: menuButtonKey || "Rifas", icon: <MenuFoldOutlined style={{ fontSize: "18px", marginLeft: "12px" }} /> }]}
           onClick={showDefaultDrawer}
-        />
+        /> */}
+        {/* <Button type="primary" onClick={showDefaultDrawer} style={{ height: "100%" }}>tetsst</Button> */}
+        <Button onClick={showDefaultDrawer} type="primary" style={{ height: "100%", width: "64px" }} icon={<MenuFoldOutlined />} size={'large'} />
 
         <Space direction="vertical" style={{ margin: "auto" }}>
           <Title style={{ color: "white", marginBottom: "4px" }} level={3}>Rifa el medallón</Title>
@@ -161,9 +180,9 @@ const App: React.FC = ({ children }: any) => {
             mode="inline"
             items={menu}
           />
-          <Flex vertical gap="small" style={{ width: '100%' }}>
+          <Flex vertical gap="small" style={{ width: '100%', marginTop: "1rem" }}>
             <Button icon={<LogoutOutlined />} onClick={() => {
-              window.localStorage.removeItem("usuario");
+              window.localStorage.removeItem("usuarioLuis");
               dispatch(setUser(null));
 
               const pathnameLength = location.pathname.split("/").length - 2;

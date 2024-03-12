@@ -26,7 +26,7 @@ const App: React.FC = () => {
   const [autenticarUsuario, { data, error, isLoading }] = useLoginValidadorQRMutation();
   React.useEffect(() => {
     if (data && data?.tipoUsuario != "v") {
-      window.localStorage.setItem("usuario", JSON.stringify(data));
+      window.localStorage.setItem("usuarioLuis", JSON.stringify(data));
       dispatch(setUser(data));
     }
   }, [data]);
@@ -35,7 +35,7 @@ const App: React.FC = () => {
   const usuario = useSelector((state: any) => state.user.user);
   const dispatch = useDispatch();
   React.useEffect(() => {
-    const localStorageUser = window.localStorage.getItem("usuario");
+    const localStorageUser = window.localStorage.getItem("usuarioLuis");
     if (localStorageUser) {
       dispatch(setUser(JSON.parse(localStorageUser)));
     }

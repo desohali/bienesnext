@@ -60,8 +60,6 @@ const FormUsuario: React.FC<{ formUsuario: any }> = ({ formUsuario }) => {
             descripcion: ""
           }}
           onFinish={async (values) => {
-            console.log('values', values)
-            return;
             await registrarUsuario(values);
             dispatch(setIsUsuario(true));
             dispatch(setOpenFormUsuario(false));

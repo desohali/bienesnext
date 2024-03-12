@@ -43,7 +43,7 @@ const FormBoleto: React.FC = () => {
 
   const [registrarPremioBoletos, { isLoading: isLoadingRegistrar }] = useRegistrarPremioBoletosMutation();
 
-  const boletosSinPremio = listaDeBoletos
+  const boletosSinPremio = (listaDeBoletos || [])
     .map((b: any) => ({ value: b.premioMenor }));
 
   const [form] = Form.useForm();
@@ -158,7 +158,7 @@ const FormBoleto: React.FC = () => {
         <Form.Item>
           <Flex vertical gap="small" style={{ width: '50%', margin: "auto" }}>
             <Button loading={isLoadingRegistrar} type="primary" htmlType="submit" block>
-              Actualizar
+              Registrar
             </Button>
           </Flex>
         </Form.Item>

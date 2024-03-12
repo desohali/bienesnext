@@ -1,13 +1,19 @@
 "use client";
 import React from 'react';
-import { Avatar, Button, Card, Col, Flex, Form, Row, Tooltip } from 'antd';
+import { Avatar, Button, Card, Col, Flex, Form, Row, Tag, Tooltip } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { PlusOutlined, UserOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
+import { PlusOutlined, UserOutlined, EditOutlined, QrcodeOutlined } from '@ant-design/icons';
 import { setOpenFormUsuario, setListaDeUsuarios } from '@/features/userSlice';
 import { useListarUsuariosQuery } from '@/services/userApi';
 import FormUsuario from '@/components/FormUsuario';
 import { useRouter } from 'next/navigation';
 const { Meta } = Card;
+
+const enumTipoUsuario: any = {
+  s: "Super Usuario",
+  a: "Administrador",
+  v: "Vendedor"
+};
 
 const Usuarios: React.FC = () => {
 
@@ -49,6 +55,7 @@ const Usuarios: React.FC = () => {
         <Col className="gutter-row" xs={24} sm={4} md={4} lg={8}>
         </Col>
       </Row>
+
       <Row gutter={[12, 12]}>
         {listaDeUsuarios.map((usuario: any) => (
           <Col key={usuario._id} className="gutter-row" xs={24} sm={12} md={8} lg={6}>
@@ -64,18 +71,22 @@ const Usuarios: React.FC = () => {
                     formUsuario.setFieldsValue({ ...usuario, rifaAsignada: usuario?.rifaAsignada?._id || "" });
                   }} shape="circle" icon={<EditOutlined />} />
                 </Tooltip>,
-                <Tooltip title="Detalles">
+                <Tooltip title="Boletos Vendidos">
                   <Button type="primary" onClick={(e) => {
                     e.stopPropagation();
                     router.push(`./usuarios/${usuario?._id}`);
-                  }} shape="circle" icon={<EyeOutlined />} />
-                </Tooltip>,
+                  }} shape="circle" icon={<QrcodeOutlined />} />
+                </Tooltip>
               ]}
             >
               <Meta
                 avatar={<Avatar icon={<UserOutlined />} />}
                 title={usuario?.usuario}
-                description={usuario?.descripcion}
+                description={(
+                  <Tag color={usuario?.estado ? "success" : "error"}>
+                    {enumTipoUsuario[usuario?.tipoUsuario]}
+                  </Tag>
+                )}
               />
             </Card>
 
