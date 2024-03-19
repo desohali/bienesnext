@@ -58,9 +58,9 @@ const FormRifa: React.FC<{ formRifa: any }> = ({ formRifa }) => {
             color: "#008080"
           }}
           onFinish={async (values) => {
-            const rifa = await registrarRifa(values);
-            if (!rifa) {
-              swal("", `Error en la rifa que intentaste ${existeIdRifa ? 'actualizar' : 'registrar'}!`, "error");
+            await registrarRifa(values);
+            if (error) {
+              swal("", `El número ${values.ganador} no es válido!`, "error");
               return;
             }
             dispatch(setIsRifa(true));
@@ -105,13 +105,13 @@ const FormRifa: React.FC<{ formRifa: any }> = ({ formRifa }) => {
                   { required: true, message: 'Por favor, ingrese 1N° ganador' },
                   {
                     validator: (_, value) => {
-                      if (value && value.toString().length == 4) return Promise.resolve();
+                      if (value && value.toString().length == 4 && new RegExp("[0,9]{4}").test(value)) return Promise.resolve();
                       return Promise.reject("1N° ganador, debe tener 4 digitos");
                     }
                   }
                 ]}
               >
-                <InputNumber placeholder="1N° ganador" style={style} />
+                <Input placeholder="1N° ganador" style={style} />
               </Form.Item>
             </Col>
             <Col span={12}>
