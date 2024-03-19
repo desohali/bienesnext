@@ -9,7 +9,7 @@ const Auth = ({ children }: any) => {
   const usuario = useSelector((state: any) => state.user.user);
 
   React.useEffect(() => {
-    if (!usuario) {
+    if (!usuario && !location.pathname.split("/").includes("juego")) {
       router.push('/login');
     }
   }, [usuario]);
