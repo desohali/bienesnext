@@ -105,7 +105,7 @@ const FormRifa: React.FC<{ formRifa: any }> = ({ formRifa }) => {
                   { required: true, message: 'Por favor, ingrese 1N° ganador' },
                   {
                     validator: (_, value) => {
-                      if (value && value.toString().length == 4 && new RegExp("[0,9]{4}").test(value)) return Promise.resolve();
+                      if (value && value.toString().length == 4 && new RegExp("[0-9]{4}").test(value)) return Promise.resolve(true);
                       return Promise.reject("1N° ganador, debe tener 4 digitos");
                     }
                   }
